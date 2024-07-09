@@ -17,6 +17,7 @@ app.use((req, res, next) => {
   next();
 });
 
+
 app.use(cors({
   origin: 'https://eat-exact-frontend.vercel.app',
 }));
