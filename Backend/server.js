@@ -23,6 +23,9 @@ app.use(cors({
 }));
 
 // routes
+app.get('/', (req, res) => {
+  res.send('Welcome to the EatExact API');
+});
 app.use("/api/recipes", recipeRoutes);
 app.use("/api/user", userRoutes);
 
