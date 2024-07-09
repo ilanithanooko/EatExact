@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useLogin } from "../hooks/useLogin";
 import salad from "../assets/salad.png";
 import { Link } from "react-router-dom";
-import jwt_decode from "jwt-decode"
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -18,7 +17,6 @@ const Login = () => {
 
   function handleCallbackResponse(response) {
     console.log("Encoded JWT ID token:" + response.credential);
-    var userObject = jwt_decode(response.credential)
   }
 
   useEffect(() => {
