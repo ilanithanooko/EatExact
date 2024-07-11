@@ -8,7 +8,9 @@ module.exports = {
       },
       colors: {
         "wood-green": "#6C9614",
-        "light-green": "#7da822"
+        "light-green": "#7da822",
+        "gray-bg": "#D3D3D3",
+        "lightest-gray": "#F3F3F3"
       },
       fontFamily: {
         montserrat: ["Montserrat"],

@@ -35,7 +35,7 @@ const Navbar = () => {
   const { user } = useAuthContext()
 
   return (
-    user && (<header className="py-1 bg-slate-200">
+    user && (<header className="py-6 bg-slate-200">
       <div className="max-w-2xl mx-auto">
         <nav className="border-gray-200">
           <div className="container mx-auto flex flex-wrap items-center justify-between relative">
@@ -116,7 +116,7 @@ const Navbar = () => {
                     <ul className="py-1" aria-labelledby="dropdownLargeButton">
                       <li>
                         <Link
-                          to="/dashboard"
+                          to="/child"
                           className="text-sm hover:bg-gray-100 text-gray-700 block px-4 py-2"
                         >
                           Child 1
@@ -124,7 +124,7 @@ const Navbar = () => {
                       </li>
                       <li>
                         <Link
-                          to="/settings"
+                          to="/child"
                           className="text-sm hover:bg-gray-100 text-gray-700 block px-4 py-2"
                         >
                           Child 2
@@ -135,7 +135,7 @@ const Navbar = () => {
                 </li>
                 <li>
                   <Link
-                    to="/services"
+                    to="/saved-recipes"
                     className="text-gray-700 hover:bg-gray-50 border-b border-gray-100 md:hover:bg-transparent md:border-0 block pl-3 pr-4 py-2 md:hover:text-blue-700 md:p-0"
                   >
                     Saved Recipes
@@ -143,7 +143,7 @@ const Navbar = () => {
                 </li>
                 <li>
                   <Link
-                    to="/pricing"
+                    to="/settings"
                     className="text-gray-700 hover:bg-gray-50 border-b border-gray-100 md:hover:bg-transparent md:border-0 block pl-3 pr-4 py-2 md:hover:text-blue-700 md:p-0"
                   >
                     Settings
