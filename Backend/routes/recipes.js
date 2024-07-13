@@ -25,7 +25,7 @@ router.post('/', createRecipe)
 // DELETE a single recipe
 router.delete('/:id', deleteRecipe)
 
-// UPDATE a new recipe
+// UPDATE a recipe
 router.patch('/:id', updateRecipe)
 
 module.exports = router

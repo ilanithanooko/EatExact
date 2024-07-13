@@ -42,6 +42,21 @@ const signupUser = async (req, res) => {
     }
   }
 
+  const setRole = async (req, res) => {
+    const { email, role } = req.body;
+    try {
+      const user = await User.findOneAndUpdate({ email: email }, {...req.body})
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      user.role = role;
+      await user.save();
+      res.status(200).json({ message: 'Role updated successfully' });
+    } catch (error) {
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
   const googleLogin = async (req, res) => {
     const { token } = req.body;
   
@@ -75,5 +90,6 @@ const signupUser = async (req, res) => {
 module.exports = {
     loginUser,
     signupUser,
+    setRole,
     googleLogin
 }

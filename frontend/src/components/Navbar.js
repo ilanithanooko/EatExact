@@ -85,7 +85,7 @@ const Navbar = () => {
                     className="bg-blue-700 md:bg-transparent text-white block pl-3 pr-4 py-2 md:text-blue-700 md:p-0 rounded focus:outline-none"
                     aria-current="page"
                   >
-                    Home
+                    Generate Recipe
                   </Link>
                 </li>
                 <li>
