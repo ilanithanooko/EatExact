@@ -16,7 +16,7 @@ function App() {
     <div>
       <BrowserRouter>
         <Navbar />
-        <div className="bg-pink-400">
+        <div>
           <Routes>
             {user && (<Route path="/" element={<Home />} />)}
             {!user && (<Route path="/" element={<LandingPage />} />)}

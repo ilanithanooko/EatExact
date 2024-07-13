@@ -153,7 +153,7 @@ const Home = () => {
             <div className="text-center font-montserrat text-3xl my-7 text-green-900 font-bold flex items-center justify-center">
               <input
                 placeholder="Anything Else?..."
-                className="block w-1/2 rounded-md border-0 py-4 pl-4 text-gray-900 placeholder:text-lg shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-wood-green sm:text-sm sm:leading-6"
+                className="block w-1/2 rounded-md border-0 py-3 pl-4 text-gray-900 placeholder:text-md shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-wood-green sm:text-sm sm:leading-6"
               />
             </div>
           </div>
@@ -281,8 +281,8 @@ const Home = () => {
               <div className="text-center font-montserrat text-3xl my-7 text-green-900 font-bold flex items-center justify-center">
                 <input
                   placeholder="Anything Else?..."
-                  className="block w-1/2 rounded-md border-0 py-4 pl-4 text-gray-900 placeholder:text-lg shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-wood-green sm:text-sm sm:leading-6"
-                />
+                  className="block w-1/2 rounded-md border-0 py-3 pl-4 text-gray-900 placeholder:text-md shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-wood-green sm:text-sm sm:leading-6"
+                  />
               </div>
             </div>
             <div className="bg-lightest-gray rounded-3xl flex-row justify-center items-center">
@@ -352,8 +352,8 @@ const Home = () => {
               <div className="text-center font-montserrat text-3xl mt-14  text-green-900 font-bold flex items-center justify-center">
                 <input
                   placeholder="Anything Else?..."
-                  className="block w-1/2 rounded-md border-0 py-4 pl-4 text-gray-900 placeholder:text-lg shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-wood-green sm:text-sm sm:leading-6"
-                />
+                  className="block w-1/2 rounded-md border-0 py-3 pl-4 text-gray-900 placeholder:text-md shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-wood-green sm:text-sm sm:leading-6"
+                  />
               </div>
             </div>
           </div>
