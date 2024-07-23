@@ -24,7 +24,19 @@ const userSchema = new Schema({
   },
   role: {
     type: String,
-  }
+  },
+  age : {
+    type: Number,
+  },
+  dietaryRestrictions : {
+    type: String,
+  },
+  favoriteIngredients : {
+    type: String,
+  },
+  unlikedIngredients : {
+    type: String,
+  },
 });
 
 const onValidUsername = (val) => {
@@ -59,7 +71,7 @@ userSchema.statics.signup = async function (firstName, lastName, email, password
   const salt = await bcryptjs.genSalt(10);
   const hash = await bcryptjs.hash(password, salt)
 
-  const user = await this.create({ firstName, lastName, email, password: hash, role: null });
+  const user = await this.create({ firstName, lastName, email, password: hash, role: null, age: null, dietaryRestrictions: null, favoriteIngredients: null, unlikedIngredients: null});
 
   return user;
 };

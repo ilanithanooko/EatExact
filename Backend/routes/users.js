@@ -3,7 +3,7 @@ const express = require('express')
 const router = express.Router()
 
 // Controller functions
-const { loginUser, signupUser, googleLogin, setRole } = require('../controllers/userController')
+const { loginUser, signupUser, googleLogin, setRole, setInfo } = require('../controllers/userController')
 
 // login route
 router.post('/login', loginUser)
@@ -13,6 +13,8 @@ router.post('/signup', signupUser)
 
 // UPDATE a role
 router.put('/updateRole', setRole)
+
+router.put('/updateInfo', setInfo)
 
 router.post('/google-login', googleLogin)
 

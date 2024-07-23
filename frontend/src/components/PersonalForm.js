@@ -13,16 +13,18 @@ const PersonalForm = ({ onBack, user }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/user/updateRole`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/user/updateInfo`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}` // Assuming token is stored in localStorage
         },
-        body: JSON.stringify({ email: user.email, role: 'Individual' }) // Using user.email to identify the user
+        // Using user.email to identify the user
+        body: JSON.stringify({ email: user.email, role: 'Individual', age: age,  dietaryRestrictions: dietaryRestrictions,
+                                favoriteIngredients: favoriteIngredients, unlikedIngredients: unlikedIngredients })
       });
       if (!response.ok) {
-        throw new Error('Failed to update role');
+        throw new Error('Failed to update information');
       } else if (response.ok){
         navigate("/")
       }

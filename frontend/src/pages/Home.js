@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
+import { useAuthContext } from '../hooks/useAuthContext';
 
 const Home = () => {
+  const { user } = useAuthContext();
+
   return (
     <div className="bg-gray-bg h-screen justify-center items-center pt-4">
       <div className="bg-white rounded-3xl w-7/12 mx-auto p-5">
@@ -8,7 +11,7 @@ const Home = () => {
           <div className="bg-lightest-gray rounded-3xl justify-center items-center">
             <div className="flex-col mx-auto">
               <div className="text-center font-montserrat text-3xl my-7 text-green-900 font-bold">
-                What do you want to eat today?
+                What do you want to eat today, {user.firstName}?
               </div>
               <form className="flex flex-row font-montserrat text-2xl">
                 <div className="mx-auto">

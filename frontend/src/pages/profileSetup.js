@@ -43,18 +43,13 @@ const ProfileSetup = () => {
     }
   };
 
-  const handleAccountOwnerSubmit = (event) => {
-    event.preventDefault();
-    setStep('familyForm');
-  };
-
   return (
     <div className="bg-gray-100 h-screen px-4 sm:px-10 lg:px-32 pt-4">
       <div className="bg-white rounded-3xl mx-auto p-8 shadow-lg">
         {step === 'selectRole' && (
           <>
             <div className="text-center font-montserrat text-3xl mb-5 text-green-900 font-bold">
-              Welcome to EatExact!
+              Welcome to EatExact, {(user.firstName).charAt(0).toUpperCase() + user.firstName.slice(1)}!
             </div>
             <div className="text-center font-montserrat text-lg mb-7 text-gray-700">
               We're excited to have you on board! <br /> EatExact is designed to make your dietary journey enjoyable and effortless by generating personalized recipes using advanced AI technology.
@@ -87,7 +82,7 @@ const ProfileSetup = () => {
         {step === 'individualOptions' && <OptionSelection onSelect={handleOptionSelect} onBack={handleBack} />}
         {step === 'personalForm' && <PersonalForm onBack={() => setStep('individualOptions')} user={user} />}
         {step === 'familyForm' && (
-          <FamilyForm onBack={handleBack} option={selectedRole} />
+          <FamilyForm onBack={() => setStep('individualOptions')} option={selectedRole} />
         )}
         {step === 'businessMenu' && <BusinessMenuForm onBack={handleBack} />}
       </div>

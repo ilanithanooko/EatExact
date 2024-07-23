@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const cors = require('cors');
 const recipeRoutes = require("./routes/recipes");
 const userRoutes = require("./routes/users");
-
+const familyMemberRoutes = require("./routes/familyMembers");
 
 // express app
 const app = express();
@@ -39,6 +39,7 @@ app.get('/', (req, res) => {
 });
 app.use("/api/recipes", recipeRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/familyMember", familyMemberRoutes);
 
 
 mongoose.connect(process.env.MONGO_URI)
