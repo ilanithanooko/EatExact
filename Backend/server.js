@@ -3,9 +3,13 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require('cors');
+const axios = require('axios');
 const recipeRoutes = require("./routes/recipes");
 const userRoutes = require("./routes/users");
 const familyMemberRoutes = require("./routes/familyMembers");
+const menuRoutes = require("./routes/menus");
+
+const apiKey = process.env.OPENAI_API_KEY;
 
 // express app
 const app = express();
@@ -40,7 +44,41 @@ app.get('/', (req, res) => {
 app.use("/api/recipes", recipeRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/familyMember", familyMemberRoutes);
+app.use("/api/menu", menuRoutes);
 
+
+// call chatGPT API
+app.post('/api/chat', async (req, res) => {
+  const prompt = req.body.prompt;
+  
+  const url = "https://api.openai.com/v1/chat/completions";
+  
+  const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+  };
+
+  const data = {
+      model: "gpt-4o",
+      messages: [
+          { role: "system", content: "you are a recipe developer mastering in creating recipes for allergic or dietary restricted individuals." },
+          { role: "user", content: prompt },
+      ],
+  };
+
+  try {
+      // const response = await axios.post(url, data, { headers });
+      // const result = response.data.choices[0].message.content;
+      // res.json({ result });
+      res.json({ prompt });
+
+  } catch (error) {
+    console.error("Error calling ChatGPT API:", error);
+    console.error("Error response data:", error.response ? error.response.data : "No response data");
+    console.error("Error response status:", error.response ? error.response.status : "No response status");
+    res.status(500).send("Error calling ChatGPT API");
+  }
+});
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {

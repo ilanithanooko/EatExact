@@ -5,7 +5,7 @@ const mongoose = require('mongoose')
 const getFamilyMembers = async (req, res) => {
   const user_id = req.user._id
 
-  const familyMembers = await Workout.find({user_id}).sort({createdAt: -1})
+  const familyMembers = await FamilyMember.find({user_id}).sort({createdAt: -1})
 
   res.status(200).json(familyMembers)
 }

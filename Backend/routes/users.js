@@ -3,13 +3,16 @@ const express = require('express')
 const router = express.Router()
 
 // Controller functions
-const { loginUser, signupUser, googleLogin, setRole, setInfo } = require('../controllers/userController')
+const { loginUser, signupUser, getUser, googleLogin, setRole, setInfo } = require('../controllers/userController')
 
 // login route
 router.post('/login', loginUser)
 
 // signup route
 router.post('/signup', signupUser)
+
+// GET a single user
+router.get('/:email', getUser)
 
 // UPDATE a role
 router.put('/updateRole', setRole)

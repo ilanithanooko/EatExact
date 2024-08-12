@@ -5,9 +5,20 @@ const { OAuth2Client } = require('google-auth-library');
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-
 const createToken = (_id) => {
   return jwt.sign({_id}, process.env.SECRET, {expiresIn: '3d'})
+}
+
+const getUser = async (req, res) => {
+  const { email } = req.params
+
+  const user = await User.findOne({ email })
+
+  if(!user){
+      return res.status(404).json({error: 'No such user'})
+  }
+  
+  res.status(200).json(user)
 }
 
 // login user
@@ -110,6 +121,7 @@ const setRole = async (req, res) => {
 module.exports = {
     loginUser,
     signupUser,
+    getUser,
     setRole,
     setInfo,
     googleLogin

@@ -10,7 +10,7 @@ const requireAuth = require("../middleware/requireAuth");
 
 const router = express.Router();
 
-// require auth for all workout routes
+// require auth for all family member routes
 router.use(requireAuth);
 
 // GET all family members
@@ -19,13 +19,13 @@ router.get("/", getFamilyMembers);
 //GET a single family member
 router.get("/:id", getFamilyMember);
 
-// POST a new family members
+// POST a new family member
 router.post("/", createFamilyMember);
 
-// DELETE a family members
+// DELETE a family member
 router.delete("/:id", deleteFamilyMember);
 
-// UPDATE a family members
+// UPDATE a family member
 router.patch("/:id", updateFamilyMember);
 
 module.exports = router;
