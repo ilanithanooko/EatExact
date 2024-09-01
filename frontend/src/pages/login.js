@@ -36,13 +36,13 @@ const Login = () => {
 
   return (
     <div className="bg-gradient-to-bl from-green-darkest to-green-600">
-      <div class="py-10 md:py-12 xl:container m-auto px-6 md:px-12">
+      <div class="py-10 md:py-12 xl:container m-auto px-6 md:px-12 font-montserrat">
         <div class="relative md:flex items-center lg:gap-12">
           <div class="w-full px-20 md:hidden">
             <img src={salad} alt="project illustration" height="" width="" />
           </div>
           <div class="text-center px-10 lg:text-left md:mt-12 lg:mt-0 sm:w-10/12 md:w-2/3 sm:mx-auto lg:mr-auto lg:w-6/12">
-            <h1 class="font-montserrat font-bold text-4xl lg:text-5xl xl:text-6xl text-white drop-shadow-md my-4">
+            <h1 class="font-bold text-4xl lg:text-5xl xl:text-6xl text-white drop-shadow-md my-4">
               Welcome Back
             </h1>
             <form className="space-y-6" onSubmit={handleSubmit}>
