@@ -54,7 +54,7 @@ const LandingPage = () => {
             Discover Your Perfect Meal Today with{" "}
                   <span className="text-green-darkest">EatExact</span>
             </h1>
-            <p class="mt-8 text-gray-300 text-xl font-montserrat">
+            <p class="mt-8 text-white text-xl font-montserrat">
             Navigating food choices with dietary restrictions can be
                   tough, but{" "}
                   <span className="text-green-darkest font-bold">EatExact</span>{" "}
