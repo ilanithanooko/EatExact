@@ -45,7 +45,7 @@ const Signup = () => {
                             name="name"
                             type="text"
                             onChange={(e) => setName(e.target.value)}
-                            value={name}
+                            value={name.charAt(0).toUpperCase() + name.slice(1)}
                             placeholder="Enter first name"
                             required
                             className="block w-full rounded-md border-0 py-4 pl-4 text-gray-900 placeholder:text-lg shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-wood-green sm:text-sm sm:leading-6"
@@ -64,7 +64,7 @@ const Signup = () => {
                             name="lastName"
                             type="text"
                             onChange={(e) => setLastName(e.target.value)}
-                            value={lastName}
+                            value={lastName.charAt(0).toUpperCase() + lastName.slice(1)}
                             placeholder="Enter last name"
                             required
                             className="block w-full rounded-md border-0 py-4 pl-4 text-gray-900 placeholder:text-lg shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-wood-green sm:text-sm sm:leading-6"
@@ -130,7 +130,7 @@ const Signup = () => {
                         disabled={isLoading}
                         className="flex w-full justify-center rounded-md bg-wood-green px-3 py-4 text-xl font-semibold leading-6 text-white shadow-sm hover:bg-light-green focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-wood-green"
                       >
-                        Sign in
+                        Sign Up
                       </button>
                     </div>
                     <div>

@@ -9,9 +9,8 @@ import Login from "./pages/login";
 import LandingPage from "./pages/landingPage"
 import ProfileSetup from "./pages/profileSetup";
 import SavedRecipes from "./pages/savedRecipes";
+import EntityRecipes from "./pages/EntityRecipes"
 import Response from "./pages/response"
-
-
 
 function App() {
   const { user } = useAuthContext()
@@ -28,6 +27,7 @@ function App() {
             <Route path="/login" element={!user ? <Login /> : <Navigate to="/"/>} />
             <Route path="/profile-setup" element={user ? <ProfileSetup /> : <Navigate to="/login" />} />
             <Route path="/saved-recipes" element={user ? <SavedRecipes /> : <Navigate to="/login" />} />
+            <Route path="/entity/:entityId" element={user ? <EntityRecipes /> : <Navigate to="/login" />} />
             <Route path="/api-response" element={user ? <Response /> : <Navigate to="/login" />} />
           </Routes>
         </div>

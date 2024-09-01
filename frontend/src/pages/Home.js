@@ -4,8 +4,8 @@ import { useAuthContext } from "../hooks/useAuthContext";
 import ChildSelectionPopup from "../components/ChildSelectionPopup";
 import MenuSelectionPopup from "../components/MenuSelectionPopup";
 import PatientSelectionPopup from "../components/PatientSelectionPopup";
-import axios from 'axios';
-
+// import spinningSalad from "../assets/spinningSalad.webm"
+import axios from "axios";
 
 const Home = () => {
   const { user } = useAuthContext();
@@ -22,8 +22,9 @@ const Home = () => {
   const [restrictions, setRestrictions] = useState([]);
   const [avoidAnythingElse, setAvoidAnythingElse] = useState("");
   const [restrictionAnythingElse, setRestrictionAnythingElse] = useState("");
-  const [userPrompt, setUserPrompt] = useState('');
-  const [apiResponse, setApiResponse] = useState('');
+  const [userPrompt, setUserPrompt] = useState("");
+  const [apiResponse, setApiResponse] = useState("");
+  const [userType, setUserType] = useState('')
   const navigate = useNavigate();
 
   const fetchUserData = async () => {
@@ -53,7 +54,18 @@ const Home = () => {
       const data = await response.json();
       setChildren(data);
       setLoading(false);
-      setShowPopup(data.length > 0);
+      if (data.length > 0){
+        if(userData.age){
+          setUserType('family')
+        } else {
+          setUserType('justKids')
+        }
+        setShowPopup(true);
+      }else {
+        setUserType('justMe')
+        setShowPopup(false);
+      }
+      
     } catch (error) {
       console.error("Failed to fetch children data:", error);
       setLoading(false);
@@ -84,9 +96,9 @@ const Home = () => {
     }
   }, [userData]);
 
-  const togglePopup = () => {
-    setShowPopup(!showPopup);
-  };
+  // const togglePopup = () => {
+  //   setShowPopup(!showPopup);
+  // };
 
   useEffect(() => {
     if (selectedChild) {
@@ -94,8 +106,9 @@ const Home = () => {
     }
   }, [selectedChild]);
 
-  const handleChildSelect = (childName) => {
-    setSelectedChild(childName);
+  const handleSelect = (selection) => {
+    if(selection != userData.firstName)
+      setSelectedChild(selection);
     setShowPopup(false); // Close popup after selection
   };
 
@@ -128,52 +141,115 @@ const Home = () => {
   };
 
   async function generateRecipePrompt() {
+    setLoading(true);
     const selectedCategory = category || categoryInput;
-    const selectedChildDetails = children.find(
-      (child) => child.name === selectedChild
-    );
-    const prompt = `
-    Generate a recipe for the category: ${selectedCategory} for a ${
-      selectedChildDetails.age
-    } years old.
-    Please avoid the following ingredients: ${[...avoiding, avoidAnythingElse]
-      .filter(Boolean)
-      .join(", ")}, ${
-      selectedChildDetails ? selectedChildDetails.unlikedIngredients : ""
-    }.
-    Consider the following dietary restrictions: ${[
-      ...restrictions,
-      restrictionAnythingElse,
-    ]
-      .filter(Boolean)
-      .join(", ")}, ${
-      selectedChildDetails ? selectedChildDetails.dietaryRestrictions : ""
-    }.
-    It would be great if the recipe could include some of the favorite ingredients: ${
-      selectedChildDetails ? selectedChildDetails.favoriteIngredients : ""
-    }, if relevant.
-    The recipe should be nutritious, delicious, and suitable for a child of this age. Please provide clear instructions and a list of necessary ingredients.
-    If possible, suggest some variations or tips for making the recipe even more appealing to children.
-    Thank you!
-  `;
-  setUserPrompt(prompt);
-  console.log(prompt);
 
-    try {
-      // const response = await axios.post(
-      //   `${process.env.REACT_APP_API_URL}/api/chat`,
-      //   { prompt },
-      //   {
-      //     headers: { Authorization: `Bearer ${user.token}` },
-      //   }
-      // );
-      // console.log(response.data.result);
-      setApiResponse('THIS IS A RECIPE!');
-      // navigate("/api-response")
-      navigate("/api-response", { state: { prompt, apiResponse: 'THIS IS A RECIPE!' } });
-    } catch (error) {
-      // console.error("Error:", error.message);
+    const individualPropmt = (selectedCategory, selectedData) => {
+      const prompt = `
+      Generate a recipe for the category: ${selectedCategory} for a ${
+        selectedData.age
+      } years old.
+      Please avoid the following ingredients: ${[...avoiding, avoidAnythingElse]
+        .filter(Boolean)
+        .join(", ")}, ${
+          selectedData ? selectedData.unlikedIngredients : ""
+      }.
+      Consider the following dietary restrictions: ${[
+        ...restrictions,
+        restrictionAnythingElse,
+      ]
+        .filter(Boolean)
+        .join(", ")}, ${
+          selectedData ? selectedData.dietaryRestrictions : ""
+      }.
+      If relevant and suitable for the recipe type, include some of the favorite ingredients: ${
+        selectedData ? selectedData.favoriteIngredients : ""
+      }. If these ingredients are not appropriate for the recipe, please omit them.
+      The recipe should be nutritious, delicious, easy to prepare and age appropriate. Please provide clear instructions and a list of necessary ingredients.
+      If possible, suggest some variations or tips for making the recipe even more appealing to individual in the age of ${selectedData.age}.
+      **IMPORTANT:** Please format the recipe using proper HTML tags. Use <h1> for the recipe title, <h2> for section titles like "Ingredients" and "Instructions", <ul> and <ol> for lists, and <p> for additional notes. Do **not** include <html>, <head>, <body>, or other unnecessary HTML elements. The response should only include the recipe content in HTML.
+      Thank you!
+    `;
+    return prompt;
     }
+
+    async function callAiAPI (prompt, selectionData) {
+      try {
+        const response = await axios.post(
+          `${process.env.REACT_APP_API_URL}/api/chat`,
+          { prompt },
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
+        console.log(response.data.result);
+        setApiResponse(response.data.result);
+        // setApiResponse('<b>THIS IS A RECIPE!</b>\nanother line\nanother line \n');
+        // navigate("/api-response")
+        navigate("/api-response", {
+          state: {
+            userFirstName: user.firstName,
+            selectedCategory,
+            apiResponse: response.data.result,
+            selectionData,
+          },
+        });
+      } catch (error) {
+        console.error("Error:", error.message);
+      }
+    }
+
+    console.log(userType)
+
+    switch (userType) {
+      case 'justMe': {
+        const generatedPrompt = individualPropmt(selectedCategory, userData)
+        setUserPrompt(generatedPrompt)
+        console.log(generatedPrompt);
+        callAiAPI(generatedPrompt, userData)
+      }
+      break;
+      case 'family': {
+        if(selectedChild) {
+          // generate for a child
+          const selectedChildDetails = children.find(
+            (child) => child.name === selectedChild
+          );
+          const generatedPrompt = individualPropmt(selectedCategory, selectedChildDetails)
+          setUserPrompt(generatedPrompt)
+          console.log(generatedPrompt);
+          callAiAPI(generatedPrompt, selectedChildDetails)
+        } else { // selected to individual
+          const generatedPrompt = individualPropmt(selectedCategory, userData)
+          setUserPrompt(generatedPrompt)
+          console.log(generatedPrompt);
+          callAiAPI(generatedPrompt, userData)
+        }
+      }
+      break;
+      case 'justKids': {
+        const selectedChildDetails = children.find(
+          (child) => child.name === selectedChild
+        );
+        const generatedPrompt = individualPropmt(selectedCategory, selectedChildDetails)
+        setUserPrompt(generatedPrompt)
+        console.log(generatedPrompt);
+        callAiAPI(generatedPrompt, selectedChildDetails)
+      }
+      break;
+      case 'professional':{
+
+      }
+      break;
+      case 'dietitian':{
+
+      }
+      break;
+      default:
+        console.log(`Something went wrong generating prompt`);
+
+    }
+    
   }
 
   return (
@@ -185,23 +261,38 @@ const Home = () => {
               <div className="text-center font-montserrat text-3xl my-7 text-green-900 font-bold">
                 What do you want to eat today, {user.firstName}?
               </div>
-              {loading && <div>Loading...</div>}
+              {loading && (
+                <div className="fixed inset-0 bg-white bg-opacity-50 flex justify-center items-center">
+                  {
+                    <dotlottie-player
+                      src="https://lottie.host/a767f44d-53aa-4a10-917a-84a9db5764ef/u2fSZoa67a.json"
+                      background="transparent"
+                      speed="1"
+                      style={{width: '150px', height: '150px'}}
+                      direction="1"
+                      playMode="normal"
+                      loop
+                      autoplay
+                    ></dotlottie-player>
+                  }
+                </div>
+              )}
               <div>
                 {showPopup && userData && userData.role === "Individual" && (
                   <ChildSelectionPopup
                     children={children}
-                    onClose={togglePopup}
-                    onSelectChild={handleChildSelect}
+                    userType={userType}
+                    userData={userData}
+                    onSelect={handleSelect}
                   />
                 )}
               </div>
               {showPopup && userData && userData.role === "Professional" && (
-                <MenuSelectionPopup menus={menus} onClose={togglePopup} />
+                <MenuSelectionPopup menus={menus} />
               )}
               {showPopup && userData && userData.role === "Dietitian" && (
                 <PatientSelectionPopup
                   patients={patients}
-                  onClose={togglePopup}
                 />
               )}
 

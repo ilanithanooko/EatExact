@@ -4,7 +4,8 @@ const {
     getRecipes,
     getRecipe,
     deleteRecipe,
-    updateRecipe
+    updateRecipe,
+    getAllRecipesByUserId
 } = require('../controllers/recipeController')
 const requireAuth = require('../middleware/requireAuth')
 
@@ -15,6 +16,9 @@ router.use(requireAuth)
 
 // GET all recipes
 router.get('/', getRecipes)
+
+// GET all recipes by userId
+router.get('/:user_id', getAllRecipesByUserId)
 
 // GET a single recipe
 router.get('/:id', getRecipe)

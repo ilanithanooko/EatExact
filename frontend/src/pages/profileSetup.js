@@ -77,7 +77,7 @@ const ProfileSetup = () => {
           <>
             <div className="text-center font-montserrat text-3xl mb-5 text-green-900 font-bold">
               Welcome to EatExact,{" "}
-              {user.firstName.charAt(0).toUpperCase() + user.firstName.slice(1)}
+              {user.firstName}
               !
             </div>
             <div className="text-center font-montserrat text-lg mb-7 text-gray-700">

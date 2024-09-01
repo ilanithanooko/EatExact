@@ -67,10 +67,10 @@ app.post('/api/chat', async (req, res) => {
   };
 
   try {
-      // const response = await axios.post(url, data, { headers });
-      // const result = response.data.choices[0].message.content;
-      // res.json({ result });
-      res.json({ prompt });
+      const response = await axios.post(url, data, { headers });
+      const result = response.data.choices[0].message.content;
+      res.json({ result });
+      // res.json({ prompt });
 
   } catch (error) {
     console.error("Error calling ChatGPT API:", error);

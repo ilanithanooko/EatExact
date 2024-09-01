@@ -16,7 +16,7 @@ const FamilyMemberForm = ({ member, onChange, onRemove }) => {
             type="text"
             name="name"
             className="w-full p-2 border border-gray-300 rounded"
-            value={member.name}
+            value={member.name.charAt(0).toUpperCase() + member.name.slice(1)}
             onChange={handleChange}
           />
         </div>

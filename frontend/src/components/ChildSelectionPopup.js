@@ -1,19 +1,20 @@
 import React from 'react';
 
-const ChildSelectionPopup = ({ children, onClose, onSelectChild }) => {
+const ChildSelectionPopup = ({ children, userType, userData, onSelect }) => {
 
   return (
-    <div onClick={onClose} className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-5 rounded shadow-lg">
+    <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-50">
+      <div className="bg-white p-5 rounded-lg shadow-[0_0_65px] shadow-wood-green/40">
         <h2 className="text-xl font-bold mb-4">We're generating a recipe for:</h2>
         <div className="grid grid-cols-2 gap-4">
           {children.map((child) => (
-            <div onClick={() => onSelectChild(child.name)} key={child._id} className="p-4 bg-gray-200 rounded text-center cursor-pointer">
+            <div onClick={() => onSelect(child.name)} key={child._id} className="p-4 bg-gray-200 rounded text-center cursor-pointer">
               {child.name}
             </div>
-          ))}
+          ))
+          }
+          {userType === 'family' && <div onClick={() => onSelect(userData.firstName)} key={userData._id} className="p-4 bg-gray-200 rounded text-center cursor-pointer">{userData.firstName}</div>}
         </div>
-        <button onClick={onClose} className="mt-4 bg-red-500 text-white p-2 rounded">Close</button>
       </div>
     </div>
   );

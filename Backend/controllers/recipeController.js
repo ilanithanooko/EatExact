@@ -25,12 +25,37 @@ const getRecipe = async (req, res) => {
     res.status(200).json(recipe)
 }
 
+const getAllRecipesByUserId = async (req, res) => {
+    const { user_id } = req.params;
+
+    // Check if the user_id is a valid MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(user_id)) {
+        return res.status(404).json({ error: 'Invalid user ID' });
+    }
+
+    try {
+        // Retrieve all recipes by user_id
+        const recipes = await Recipe.find({ user_id });
+
+        // If no recipes are found, return a 404
+        if (!recipes.length) {
+            return res.status(404).json({ error: 'No recipes found for this user' });
+        }
+
+        // Return the found recipes
+        res.status(200).json(recipes);
+    } catch (error) {
+        // If an error occurs, return a 500 status with the error message
+        res.status(500).json({ error: error.message });
+    }
+};
+
 // Create new recipe
 const createRecipe = async (req, res) => {
-  const { title, description } = req.body;
+  const { title, category, description, user_id } = req.body;
 
   try {
-    const recipe = await Recipe.create({ title, description });
+    const recipe = await Recipe.create({ title, category, description, user_id });
     res.status(200).json(recipe);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -77,6 +102,7 @@ module.exports = {
     createRecipe,
     getRecipes,
     getRecipe,
+    getAllRecipesByUserId,
     deleteRecipe,
     updateRecipe
 }
