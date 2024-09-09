@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Recipe = ({ title, ingredients, instructions, tips }) => {
+const Recipe = ({ title, ingredients, instructions, tips, userData }) => {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">{title}</h1> {/* Tailwind styling */}
@@ -16,12 +16,14 @@ const Recipe = ({ title, ingredients, instructions, tips }) => {
           <li key={index} className="mb-1">{instruction}</li>
         ))}
       </ol>
+      <div className={`${userData && userData.role === "Professional" ? "hidden" : ""}`}>
       <h2 className="text-xl font-semibold mb-2">Variations and Tips</h2>
       <ul className="list-disc list-inside">
         {tips.map((tip, index) => (
           <li key={index} className="mb-1">{tip}</li>
         ))}
       </ul>
+      </div>
     </div>
   );
 };

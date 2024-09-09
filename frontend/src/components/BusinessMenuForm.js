@@ -5,15 +5,15 @@ import { useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaPlus } from "react-icons/fa";
 import MenuForm from "./MenuForm";
 
-const BusinessMenuForm = ({ onBack }) => {
+const BusinessMenuForm = ({ onBack, onUserDataChange }) => {
   const navigate = useNavigate();
   const [menus, setMenus] = useState([]);
+  const [menusCount, setMenusCount] = useState(0);
   const [isOwnerCollapsed, setIsOwnerCollapsed] = useState(false);
   const { user } = useAuthContext();
   const [error, setError] = useState("");
 
   const addMenu = () => {
-    setIsOwnerCollapsed(true);
     setMenus([
       ...menus,
       {
@@ -21,6 +21,7 @@ const BusinessMenuForm = ({ onBack }) => {
         name: "",
       },
     ]);
+    setMenusCount(menusCount + 1);
   };
 
   const handleMenuChange = (id, data) => {
@@ -31,6 +32,14 @@ const BusinessMenuForm = ({ onBack }) => {
 
   const removeMenu = (id) => {
     setMenus((prevMenus) => prevMenus.filter((menu) => menu.id !== id));
+    setMenusCount(menusCount - 1);
+  };
+
+  const showError = (message) => {
+    setError(message);
+    setTimeout(function () {
+      setError("");
+    }, 5000);
   };
 
   const handleSubmit = async (event) => {
@@ -70,10 +79,13 @@ const BusinessMenuForm = ({ onBack }) => {
           throw new Error("Failed to add menu");
         }
       }
+      if (onUserDataChange) {
+        onUserDataChange();
+      }
       navigate("/");
       // Redirect or show success message
     } catch (error) {
-      setError(error.message);
+      showError(error.message);
     }
   };
 
@@ -83,55 +95,83 @@ const BusinessMenuForm = ({ onBack }) => {
         onClick={onBack}
         className="mb-4 flex items-center text-green-900"
       >
-        <FaArrowLeft className="mr-2" /> Back
+        <FaArrowLeft className="mr-2" />
       </button>
-      <h3 className="text-center font-montserrat text-2xl mb-4 text-green-900 font-bold">
-        Add Business Menus
-      </h3>
-      <p className="text-center font-montserrat text-lg mb-4 text-gray-700">
-        You can add menus later as well.
-      </p>
-      {/* <form className="space-y-4">
-        <div>
-          <label className="block font-montserrat text-lg mb-2">Menu Name</label>
-          <input type="text" className="w-full p-2 border border-gray-300 rounded" />
-        </div>
-        <button type="submit" className="w-full bg-wood-green p-3 text-white font-bold rounded">
-          Add Menu
-        </button>
-      </form> */}
 
-      
-      <div>
-        {menus.map((menu, index) => (
-          <Collapsible
-            key={menu.id}
-            trigger={menu.name || `Menu ${index + 1}`}
-            open={index === menus.length - 1}
+      <div className="md:px-8 lg:px-24 xl:px-36 2xl:px-96">
+        <div>
+          <h3 className="text-center text-xl md:text-2xl mb-4 text-green-800 font-semibold">
+            Create Personalized Menus for Your Customers
+          </h3>
+          <div className="text-center text-lg mb-5 text-gray-700">
+            As a professional chef, you know that one size doesn’t fit all when
+            it comes to dining. By simply selecting the types of menus you want
+            to offer—whether it's gluten-free, dairy-free, or other dietary
+            options—we’ll help you craft personalized dishes that meet your
+            guests' specific needs.
+            <br />
+            This streamlined approach ensures that your restaurant provides
+            delicious and inclusive options, giving every guest a memorable
+            dining experience, no matter their dietary requirements.
+          </div>
+          <div className="flex justify-center pt-2">
+            <button
+              type="button"
+              onClick={() => {
+                addMenu();
+              }}
+              className={`${
+                menusCount === 0 ? "" : "hidden"
+              } w-12 h-12 bg-green-600 text-white flex items-center justify-center rounded-full`}
+            >
+              <FaPlus className="text-2xl" />
+            </button>
+          </div>
+
+          <div>
+            {menus.map((menu, index) => (
+              <div>
+              <Collapsible
+                key={menu.id}
+                trigger={menu.name || `Menu ${index + 1}`}
+                open={index === menus.length - 1}
+              >
+                <MenuForm
+                  menu={menu}
+                  onChange={(data) => handleMenuChange(menu.id, data)}
+                  onRemove={() => removeMenu(menu.id)}
+                  onAdd={() => {
+                    addMenu();
+                  }}
+                />
+              </Collapsible>
+              <hr className="my-2"></hr>
+              </div>
+            ))}
+          </div>
+
+          <div
+            className={`${
+              menusCount === 0 ? "hidden" : ""
+            } flex flex-col justify-center items-center`}
           >
-            <MenuForm
-              menu={menu}
-              onChange={(data) => handleMenuChange(menu.id, data)}
-              onRemove={() => removeMenu(menu.id)}
-            />
-          </Collapsible>
-        ))}
-        <button
-          type="button"
-          onClick={addMenu}
-          className="flex items-center justify-center w-full mt-4 bg-wood-green p-3 text-white font-bold rounded-full"
-        >
-          <FaPlus className="mr-2" />Add Another Menu
-        </button>
+            <div>
+              <button
+                type="button"
+                onClick={handleSubmit}
+                className={`text-center rounded-md py-3 px-12 text-sm lg:text-lg text-white shadow-md bg-green-600 hover:bg-green-700`}
+              >
+                Let's get started!
+              </button>
+            </div>
+            {error && (
+              <div className="mt-2">
+                <p className="text-red-500">{error}</p>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
-      <button
-        type="button"
-        className="w-full mt-4 bg-wood-green p-3 text-white font-bold rounded"
-        onClick={handleSubmit}
-      >
-        Let's get started!
-      </button>
-      {error && <p className="text-red-500 mt-4">{error}</p>}
     </div>
   );
 };

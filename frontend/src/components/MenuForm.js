@@ -1,7 +1,7 @@
 import React from 'react';
-import { FaTrash } from 'react-icons/fa';
+import { FaTrash, FaPlus } from 'react-icons/fa';
 
-const MenuForm = ({ menu, onChange, onRemove }) => {
+const MenuForm = ({ menu, onChange, onRemove, onAdd }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     onChange({ [name]: value });
@@ -16,13 +16,27 @@ const MenuForm = ({ menu, onChange, onRemove }) => {
             type="text"
             name="name"
             className="w-full p-2 border border-gray-300 rounded"
-            value={menu.name}
+            value={menu.name.charAt(0).toUpperCase() + menu.name.slice(1)}
             onChange={handleChange}
           />
         </div>
-        <button type="button" onClick={onRemove} className="flex items-center justify-center w-full mt-4 bg-red-500 p-3 text-white font-bold rounded-full">
-          <FaTrash className="mr-2" /> Remove Menu
-        </button>
+
+        <div className="flex justify-center my-4 gap-4">
+          <button
+            type="button"
+            onClick={onAdd}
+            className="w-12 h-12 bg-green-600 text-white flex items-center justify-center rounded-full"
+          >
+            <FaPlus className="text-2xl"/>
+          </button>
+          <button
+            type="button"
+            onClick={onRemove}
+            className="w-12 h-12 bg-red-500 text-white flex items-center justify-center rounded-full"
+          >
+            <FaTrash className="text-2xl"/>
+          </button>
+        </div>
       </form>
     </div>
   );

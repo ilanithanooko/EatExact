@@ -5,6 +5,7 @@ import ChildSelectionPopup from "../components/ChildSelectionPopup";
 import MenuSelectionPopup from "../components/MenuSelectionPopup";
 import PatientSelectionPopup from "../components/PatientSelectionPopup";
 // import spinningSalad from "../assets/spinningSalad.webm"
+import Selectible from "../components/Selectible";
 import axios from "axios";
 
 const Home = () => {
@@ -252,6 +253,11 @@ const Home = () => {
     
   }
 
+  const handleClick = () => {
+    console.log('Button clicked!');
+    // Add your custom logic here
+  };
+
   return (
     <div className="bg-gray-bg h-screen justify-center items-center pt-4">
       <div className="bg-white rounded-3xl w-7/12 mx-auto p-5">
@@ -297,6 +303,17 @@ const Home = () => {
               )}
 
               <form className="flex flex-row font-montserrat text-2xl">
+                {/* <div>
+
+
+                {categories.map((cat) => (
+            <div onClick={() => onSelect(cat.name)} className="p-4 bg-gray-200 rounded text-center cursor-pointer">
+              {child.name}
+            </div>
+          ))
+          }
+                <Selectible label="Click Me" onClick={handleClick} />
+                </div> */}
                 <div className="mx-auto">
                   <input
                     type="radio"

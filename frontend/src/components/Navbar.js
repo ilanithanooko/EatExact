@@ -3,117 +3,145 @@ import { Link, useNavigate } from "react-router-dom";
 import { useLogout } from "../hooks/useLogout";
 import { useAuthContext } from "../hooks/useAuthContext";
 
-const Navbar = () => {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+const Navbar = ({ userData }) => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [userType, setUserType] = useState("");
+  const { user } = useAuthContext();
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        !event.target.closest("#dropdownNavbarLink") &&
-        !event.target.closest("#dropdownNavbar")
-      ) {
-        setIsDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener("click", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, []);
-
-  const { logout } = useLogout()
+  const { logout } = useLogout();
   const navigate = useNavigate();
 
-
   const handleClick = () => {
+    toggleMobileMenu();
     logout();
     navigate("/");
-  }
+  };
 
-  const { user } = useAuthContext()
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  useEffect(() => {
+    // fetch appropriate data according to role
+    if (userData) {
+      if (userData.role === "Individual") {
+        fetchChildren();
+      }
+    }
+  }, [userData]);
+
+  const fetchChildren = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/familyMember`,
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+      const data = await response.json();
+      if (data.length > 0) {
+        if (userData && userData.age) {
+          setUserType("family");
+        } else {
+          setUserType("justKids");
+        }
+      } else {
+        setUserType("justMe");
+      }
+    } catch (error) {
+      console.error("Failed to fetch children data:", error);
+    }
+  };
 
   return (
-    user && (<header className="py-6 bg-slate-200">
-      <div className="max-w-2xl mx-auto">
-        <nav className="border-gray-200">
+    user && (
+      <header className="py-4 bg-gradient-to-bl from-emerald-950 to-green-600 px-5">
+        <nav className="">
           <div className="container mx-auto flex flex-wrap items-center justify-between relative">
             <Link to="/" className="flex">
-              <span className="self-center text-lg font-semibold whitespace-nowrap">
+              <span className="text-white self-center text-2xl whitespace-nowrap">
                 EatExact
               </span>
             </Link>
             <button
+              onClick={toggleMobileMenu} // Toggle mobile menu when button is clicked
               data-collapse-toggle="mobile-menu"
               type="button"
-              className="md:hidden ml-3 text-gray-400 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-lg inline-flex items-center justify-center"
+              className="md:hidden ml-3 inline-flex"
               aria-controls="mobile-menu"
-              aria-expanded="false"
+              aria-expanded={isMobileMenuOpen ? "true" : "false"}
             >
-              <span className="sr-only">Open main menu</span>
-              <svg
-                className="w-6 h-6"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                  clipRule="evenodd"
-                ></path>
-              </svg>
-              <svg
-                className="hidden w-6 h-6"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                ></path>
-              </svg>
+              <i class="fa-solid fa-bars" style={{ color: "#ffffff" }}></i>
             </button>
-            <div className="hidden md:block w-full md:w-auto" id="mobile-menu">
-              <ul className="flex-col md:flex-row flex md:space-x-8 mt-4 md:mt-0 md:text-sm md:font-medium">
+            {/* Conditionally render mobile menu based on state */}
+            <div
+              className={`${
+                isMobileMenuOpen ? "block" : "hidden"
+              } md:block w-full md:w-auto`}
+              id="mobile-menu"
+            >
+              <ul className="flex-col md:flex-row flex md:space-x-8 mt-4 md:mt-0 md:text-sm">
                 <li>
                   <Link
+                    onClick={isMobileMenuOpen ? toggleMobileMenu : () => {}}
                     to="/"
-                    className="bg-blue-700 md:bg-transparent text-white block pl-3 pr-4 py-2 md:text-blue-700 md:p-0 rounded focus:outline-none"
-                    aria-current="page"
+                    className="text-lg hover:bg-pastel-green focus:outline-none text-white border-b border-gray-100 block pl-3 pr-4 py-2 md:hover:text-pastel-green md:hover:bg-transparent md:p-0 md:bg-transparent md:border-0 "
                   >
                     Generate Recipe
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    to="/saved-recipes"
-                    className="text-gray-700 hover:bg-gray-50 border-b border-gray-100 md:hover:bg-transparent md:border-0 block pl-3 pr-4 py-2 md:hover:text-blue-700 md:p-0"
+                  <button
+                    onClick={() => {
+                      if (isMobileMenuOpen) {
+                        toggleMobileMenu();
+                      }
+
+                      if (userData.role === "Individual" && userType === "justMe") {
+                        navigate(`/entity/${userData._id}`, {
+                          state: { userData: userData },
+                        });
+                      } else {
+                        navigate("/saved-recipes");
+                      }
+                    }}
+                    className="text-lg hover:bg-pastel-green focus:outline-none text-white border-b border-gray-100 block pl-3 pr-4 py-2 md:hover:text-pastel-green md:hover:bg-transparent md:p-0 md:bg-transparent md:border-0"
                   >
                     Saved Recipes
-                  </Link>
+                  </button>
                 </li>
                 <li>
                   <Link
+                    onClick={isMobileMenuOpen ? toggleMobileMenu : () => {}}
                     to="/settings"
-                    className="text-gray-700 hover:bg-gray-50 border-b border-gray-100 md:hover:bg-transparent md:border-0 block pl-3 pr-4 py-2 md:hover:text-blue-700 md:p-0"
+                    className="text-lg hover:bg-pastel-green focus:outline-none text-white border-b border-gray-100 block pl-3 pr-4 py-2 md:hover:text-pastel-green md:hover:bg-transparent md:p-0 md:bg-transparent md:border-0 "
                   >
                     Settings
                   </Link>
                 </li>
                 <li>
-                <button onClick={handleClick}>Log out</button>
+                  <Link
+                    onClick={handleClick}
+                    className="text-lg hover:bg-pastel-green focus:outline-none text-white border-b border-gray-100 block pl-3 pr-4 py-2 md:hover:text-pastel-green md:hover:bg-transparent md:p-0 md:bg-transparent md:border-0 "
+                  >
+                    Log out
+                  </Link>
                 </li>
+                {/* <li>
+                    <button
+                      className="hover:bg-pastel-green focus:outline-none text-white border-b border-gray-100 block pl-3 pr-4 py-2 md:hover:text-pastel-green md:hover:bg-transparent md:p-0 md:bg-transparent md:border-0 "
+                      onClick={handleClick}
+                    >
+                      Log out
+                    </button>
+                  </li> */}
               </ul>
             </div>
           </div>
         </nav>
-      </div>
-    </header>)
-    );
+      </header>
+    )
+  );
 };
 
 export default Navbar;

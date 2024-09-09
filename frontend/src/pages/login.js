@@ -35,7 +35,7 @@ const Login = () => {
   }, []);
 
   return (
-    <div className="bg-gradient-to-bl from-green-darkest to-green-600">
+    // <div className="bg-gradient-to-bl from-green-darkest to-green-600">
       <div class="py-10 md:py-12 xl:container m-auto px-6 md:px-12 font-montserrat">
         <div class="relative md:flex items-center lg:gap-12">
           <div class="w-full px-20 md:hidden">
@@ -98,9 +98,9 @@ const Login = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="flex w-full justify-center rounded-md bg-green-darkest hover:bg-green-950 px-3 py-4 text-xl font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-900"
+                  className="flex w-full justify-center rounded-md bg-green-darkest hover:bg-green-950 px-3 py-4 text-2xl leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-900"
                 >
-                  Sign in
+                  Sign In
                 </button>
               </div>
               {/* <div className="flex justify-center items-center ">
@@ -108,7 +108,7 @@ const Login = () => {
               </div> */}
               {error && <div className="text-red-800">{error}</div>}
             </form>
-            <p className="mt-8 text-center text-xl xl:text-2xl text-white">
+            <p className="mt-8 text-center text-lg xl:text-xl text-white">
               Not a member?{" "}
               <Link
                 to="/signup"
@@ -123,7 +123,7 @@ const Login = () => {
           </div>
         </div>
       </div>
-    </div>
+    // </div>
   );
 };
 

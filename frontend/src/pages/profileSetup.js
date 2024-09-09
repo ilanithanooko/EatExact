@@ -8,7 +8,7 @@ import BusinessMenuForm from "../components/BusinessMenuForm";
 import { useAuthContext } from "../hooks/useAuthContext";
 
 // ProfileSetup Component
-const ProfileSetup = () => {
+const ProfileSetup = ({onUserDataChange}) => {
   const [selectedRole, setSelectedRole] = useState(null);
   const [step, setStep] = useState("selectRole"); // 'selectRole', 'individualOptions', 'personalForm', 'familyForm'
   const navigate = useNavigate();
@@ -71,44 +71,48 @@ const ProfileSetup = () => {
   };
 
   return (
-    <div className="bg-gray-100 h-screen px-4 sm:px-10 lg:px-32 pt-4">
-      <div className="bg-white rounded-3xl mx-auto p-8 shadow-lg">
+      <div className="px-5 xl:px-8">
         {step === "selectRole" && (
           <>
-            <div className="text-center font-montserrat text-3xl mb-5 text-green-900 font-bold">
+            <div className="text-center text-xl md:text-3xl mb-5 text-green-800 font-semibold">
               Welcome to EatExact,{" "}
               {user.firstName}
               !
             </div>
-            <div className="text-center font-montserrat text-lg mb-7 text-gray-700">
+            <div className="text-center text-lg mb-5 text-gray-700">
               We're excited to have you on board! <br /> EatExact is designed to
-              make your dietary journey enjoyable and effortless by generating
+              make your dietary journey enjoyable and effortless<br/> by generating
               personalized recipes using advanced AI technology.
             </div>
-            <div className="text-center font-montserrat text-xl text-gray-900">
-              Let's Get Started!
-            </div>
-            <div className="text-center font-bold font-montserrat text-lg mb-7 text-gray-700">
+            <div className="text-center font-bold text-lg mb-3 text-gray-700">
               To tailor your experience, please select the account type that
               best describes you:
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:px-10">
-              <RoleButton
-                role="Individual Use"
-                description="Ideal for individuals who want to manage their own and their family's dietary restrictions, discovering delicious, AI-generated recipes tailored to their unique needs."
-                onClick={() => handleRoleSelect("Individual Use")}
-              />
+            <div className="grid grid-cols-1 xl:grid-cols-3 xl:px-28 gap-6">
+              <div>
+                <RoleButton
+                  role="Individual Use"
+                  description="Ideal for individuals who want to manage their own and their family's dietary restrictions, discovering delicious, AI-generated recipes tailored to their unique needs."
+                  onClick={() => handleRoleSelect("Individual Use")}
+                />
+              </div>
+
+              <div>
               <RoleButton
                 role="Professional Use"
                 description="Perfect for culinary professionals seeking to create innovative recipes and manage diverse menus, such as vegan or gluten-free, to cater to clients with specific dietary requirements."
                 onClick={() => handleRoleSelect("Professional Use")}
               />
-              <RoleButton
-                role="Dietitian"
-                description="Tailored for dietitians focused on creating personalized, healthy meal plans that accommodate diverse dietary restrictions and effectively manage the unique dietary needs of their patients."
-                onClick={() => handleRoleSelect("Dietitian")}
-              />
-              <div>{error && <p className="text-red-500 mt-4">{error}</p>}</div>
+              </div>
+
+              <div>
+                <RoleButton
+                  role="Dietitian"
+                  description="Tailored for dietitians focused on creating personalized meal plans that accommodate diverse dietary restrictions and effectively manage  their patients' unique dietary needs."
+                  onClick={() => handleRoleSelect("Dietitian")}
+                />
+              </div>
+              {/* <div>{error && <p className="text-red-500 mt-4">{error}</p>}</div> */}
             </div>
           </>
         )}
@@ -119,17 +123,19 @@ const ProfileSetup = () => {
           <PersonalForm
             onBack={() => setStep("individualOptions")}
             user={user}
+            onUserDataChange={onUserDataChange}
           />
         )}
         {step === "familyForm" && (
           <FamilyForm
             onBack={() => setStep("individualOptions")}
             option={selectedRole}
+            onUserDataChange={onUserDataChange}
           />
         )}
-        {step === "businessMenu" && <BusinessMenuForm onBack={handleBack} />}
+        {step === "businessMenu" && <BusinessMenuForm onBack={handleBack} onUserDataChange={onUserDataChange} />}
       </div>
-    </div>
+
   );
 };
 
