@@ -6,6 +6,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { GrClose } from "react-icons/gr";
 import { FaTrash } from "react-icons/fa";
 import { FaPenToSquare } from "react-icons/fa6";
+import RecipeSection from "../components/RecipeSection";
+import EditRecipe from "../components/EditRecipe";
 
 const EntityRecipes = () => {
   const { user } = useAuthContext();
@@ -15,7 +17,8 @@ const EntityRecipes = () => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedRecipe, setSelectedRecipe] = useState(null); // Track the selected recipe
-  const [isPopupVisible, setIsPopupVisible] = useState(false); // Track the pop-up visibility
+  const [isRecipePopupVisible, setIsRecipePopupVisible] = useState(false); // Track the pop-up visibility
+  const [isEditPopupVisible, setIsEditPopupVisible] = useState(false); // Track the pop-up visibility
   const [recipeToDelete, setRecipeToDelete] = useState(null); // Track the specific recipe to delete
   const [title, setTitle] = useState("");
   const [ingredients, setIngredients] = useState("");
@@ -23,9 +26,20 @@ const EntityRecipes = () => {
   const [tips, setTips] = useState("");
   const [noRecipes, setNoRecipes] = useState(false);
 
+  const [recipeData, setRecipeData] = useState({
+    title: title,
+    ingredients: ingredients,
+    instructions: instructions,
+    tips: tips
+  });
+
+  const handleRecipeChange = (e) => {
+    const { name, value } = e.target;
+    setRecipeData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
   const location = useLocation();
   const navigate = useNavigate();
-
   const { userData } = location.state || {};
 
   useEffect(() => {
@@ -74,10 +88,7 @@ const EntityRecipes = () => {
     }
   };
 
-  const handleRecipeClick = (recipe) => {
-    setSelectedRecipe(recipe); // Set the selected recipe
-    setIsPopupVisible(true); // Show the pop-up
-
+  const parser = (recipe) => {
     // Parse the HTML response into structured data
     const parser = new DOMParser();
     const doc = parser.parseFromString(recipe.description, "text/html");
@@ -93,11 +104,27 @@ const EntityRecipes = () => {
         (li) => li.textContent
       )
     );
+  }
+
+  const handleRecipeClick = (recipe) => {
+    setSelectedRecipe(recipe); // Set the selected recipe
+    setIsRecipePopupVisible(true); // Show the pop-up
+    parser(recipe)
   };
 
+  const handleRecipeEdit = (recipe) => {
+    setIsEditPopupVisible(true);
+    parser(recipe)
+    setRecipeData({title: title, ingredients:ingredients, instructions: instructions, tips:tips})
+  }
+
   const closePopup = () => {
-    setIsPopupVisible(false); // Hide the pop-up
+    setIsRecipePopupVisible(false); // Hide the pop-up
     setRecipeToDelete(null); // Hide the confirmation pop-up
+  };
+
+  const closeEditPopup = () => {
+    setIsEditPopupVisible(false); // Hide the pop-up
   };
 
   const handleDeleteClick = (recipeId) => {
@@ -194,66 +221,31 @@ const EntityRecipes = () => {
         {/* Display Recipes */}
         <div className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6`}>
           {filteredRecipes.map((recipe) => (
-            <div className="border-2 bg-white text-black text-center rounded-md p-2 text-sm lg:text-lg shadow-md border-green-600">
-              <div
-                key={recipe._id}
-                className={`cursor-pointer text-black text-center rounded-md p-5 text-sm lg:text-lg border-green-600 bg-gray-100 hover:bg-green-600 hover:text-white`}
-                onClick={() => handleRecipeClick(recipe)} // Handle recipe click
-              >
-                {recipe.title}
-              </div>
+            <RecipeSection
+            key={recipe._id}
+            recipe={recipe}
+            onRecipeClick={() => {handleRecipeClick(recipe)}}
+            onDelete={() => {handleDeleteClick(recipe._id)}}
+            onConfirm={confirmDelete}
+            onCancel={cancelDelete}
+            onEdit={() => {handleRecipeEdit(recipe)}}
+            recipeToDelete={recipeToDelete}
+            />
 
-              <div className={`flex gap-x-2 mt-2`}>
-                <button
-                  key={recipe._id}
-                  type="button"
-                  onClick={() => {}}
-                  className="w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center rounded-full"
-                >
-                  <FaPenToSquare className="text-lg" />
-                </button>
-                <button
-                  key={recipe._id}
-                  type="button"
-                  onClick={() => handleDeleteClick(recipe._id)} // Handle delete click
-                  className="w-8 h-8 bg-red-500 hover:bg-red-600 text-white flex items-center justify-center rounded-full"
-                >
-                  <FaTrash className="text-lg" />
-                </button>
-
-                {recipeToDelete === recipe._id && (
-                  <div className="flex justify-center items-center text-center text-xl gap-2">
-                    <p className="text-sm lg:text-lg">Are you sure?</p>
-                    <button
-                      className="w-8 h-8 bg-red-500 hover:bg-red-600 text-white text-sm flex items-center justify-center rounded-full"
-                      onClick={confirmDelete}
-                    >
-                      Yes
-                    </button>
-                    <button
-                      className="w-8 h-8 bg-gray-500 hover:bg-gray-600 text-white text-sm flex items-center justify-center rounded-full"
-                      onClick={cancelDelete}
-                    >
-                      No
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
           ))}
         </div>
       </div>
 
       {/* Pop-up for Recipe Details */}
-      {isPopupVisible && selectedRecipe && (
+      {isRecipePopupVisible && selectedRecipe && (
         <div className="fixed inset-0 mt-16 flex justify-center items-center">
           <div className="flex flex-col bg-white rounded-lg shadow-lg p-5 mx-4 overflow-y-auto max-h-[80vh]">
             <div className="text-right">
               <button
-                className="w-12 h-12 bg-gray-500 hover:bg-gray-600 text-white flex items-center justify-center rounded-full"
+                className="w-8 h-8 bg-gray-500 hover:bg-gray-600 text-white flex items-center justify-center rounded-full"
                 onClick={closePopup}
               >
-                <GrClose className="text-2xl" />
+                <GrClose className="text-lg" />
               </button>
             </div>
             <Recipe
@@ -266,6 +258,30 @@ const EntityRecipes = () => {
           </div>
         </div>
       )}
+
+      {/* Pop-up for Recipe Edit */}
+    {isEditPopupVisible && (
+        <div className="fixed inset-0 mt-16 flex justify-center items-center">
+        <div className="flex flex-col bg-white rounded-lg shadow-lg p-5 mx-4 overflow-y-auto w-auto max-w-full max-h-[80vh]">
+          <div className="text-right">
+            <button
+              className="w-8 h-8 bg-gray-500 hover:bg-gray-600 text-white flex items-center justify-center rounded-full"
+              onClick={closeEditPopup}
+            >
+              <GrClose className="text-lg" />
+            </button>
+          </div>
+          <EditRecipe
+            title={recipeData.title}
+            ingredients={recipeData.ingredients}
+            instructions={recipeData.instructions}
+            tips={recipeData.tips}
+            handleRecipeChange={(e)=>{handleRecipeChange(e)}}
+          />
+        </div>
+      </div>
+)}
+
     </div>
   );
 };
