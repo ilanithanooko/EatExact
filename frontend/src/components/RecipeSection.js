@@ -12,7 +12,7 @@ const RecipeSection = ({
   recipeToDelete,
 }) => {
   return (
-    <div className="border-2 bg-white text-black text-center rounded-md p-2 text-sm lg:text-lg shadow-md border-green-600">
+    <div className="grid grid-rows-1 border-2 bg-white text-black text-center rounded-md p-2 text-sm lg:text-lg shadow-md border-green-600">
       <div
         className="cursor-pointer text-black text-center rounded-md p-5 text-sm lg:text-lg border-green-600 bg-gray-100 hover:bg-green-600 hover:text-white"
         onClick={onRecipeClick} // Handle recipe click

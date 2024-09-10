@@ -136,9 +136,6 @@ const Dashboard = () => {
       setMenus(data);
       setUserType("pro");
       setLoading(false);
-      if (data.length > 0) {
-        setGridColumns(data.length);
-      }
     } catch (error) {
       console.error("Failed to fetch menus data:", error);
       setLoading(false);
@@ -151,7 +148,7 @@ const Dashboard = () => {
 
   // Update gridColumns after userType is set
   useEffect(() => {
-    if (userType && children.length) {
+    if (userType && userData.role === "Individual" && children.length) {
       setGridColumns(
         children.length >= 2
           ? `grid grid-cols-2 md:grid-cols-${
@@ -162,7 +159,11 @@ const Dashboard = () => {
             } gap-x-5 gap-y-2 md:gap-x-10`
       );
     }
-  }, [userType, children]);
+
+    if (userType && userData.role === "Professional" && menus.length) {
+      setGridColumns(`grid grid-cols-2 md:grid-cols-${menus.length} gap-x-5 gap-y-2 md:gap-x-10`);
+    }
+  }, [userType, children, menus]);
 
   useEffect(() => {
     fetchUserData();
@@ -326,7 +327,7 @@ const Dashboard = () => {
         break;
       case "family":
         {
-          if (selectedChild) {
+          if (selectedChild.name) {
             const selectedChildDetails = children.find(
               (child) => child.name === selectedChild
             );

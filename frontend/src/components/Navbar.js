@@ -105,7 +105,7 @@ const Navbar = ({ userData }) => {
                         navigate("/saved-recipes");
                       }
                     }}
-                    className="text-lg hover:bg-pastel-green focus:outline-none text-white border-b border-gray-100 block pl-3 pr-4 py-2 md:hover:text-pastel-green md:hover:bg-transparent md:p-0 md:bg-transparent md:border-0"
+                    className="w-full text-left text-lg hover:bg-pastel-green focus:outline-none text-white border-b border-gray-100 block pl-3 pr-4 py-2 md:hover:text-pastel-green md:hover:bg-transparent md:p-0 md:bg-transparent md:border-0"
                   >
                     Saved Recipes
                   </button>

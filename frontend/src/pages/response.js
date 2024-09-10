@@ -3,6 +3,7 @@ import { useAuthContext } from "../hooks/useAuthContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Recipe from '../components/Recipe';
+import { FaTelegram, FaRegHeart, FaHeart, FaWhatsapp} from "react-icons/fa";
 
 const Response = () => {
   const { user } = useAuthContext();
@@ -24,7 +25,7 @@ const Response = () => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(apiResponse, 'text/html');
   const title = doc.querySelector('h1')?.textContent || 'No Title';
-  const ingredients = Array.from(doc.querySelectorAll('ul li')).map(li => li.textContent);
+  const ingredients = Array.from(doc.querySelectorAll('ul:nth-of-type(1) li')).map(li => li.textContent);
   const instructions = Array.from(doc.querySelectorAll('ol li')).map(li => li.textContent);
   const tips = Array.from(doc.querySelectorAll('ul:nth-of-type(2) li')).map(li => li.textContent);
 
@@ -93,30 +94,33 @@ const Response = () => {
   };
 
   return (
-    <div className="bg-gray-bg h-screen justify-center items-center pt-4">
-      <div className="bg-white rounded-3xl w-7/12 mx-auto p-5">
+    <div className="md:px-10 xl:px-64">
+      <div className="px-2">
         <div className="flex justify-end ">
-          <div className="bg-wood-green text-white rounded-3xl p-4 mb-6 w-8/12">
+          <div className="bg-green-600 text-white md:text-lg rounded-3xl p-4 mb-6 w-9/12">
             <>{userFirstName}, Here's the {selectedCategory} recipe you've asked for, considering all of your dietary restrictions and personal taste:</>
           </div>
         </div>
         <div className="flex justify-start ">
-          <div className="bg-lightest-gray text-black rounded-3xl p-4 mb-6 font-semibold w-8/12">
+          <div className="bg-white text-black rounded-3xl p-4 mb-6 w-11/12 lg:w-8/12">
             <Recipe title={title} ingredients={ingredients} instructions={instructions} tips={tips} />
-            <div className="flex justify-end ">
-              <div>
-                <br />
-                <i
-                  className={`fa-${isLiked ? "solid" : "regular"} fa-heart fa-lg`}
-                  onClick={handleLikeClick}
-                  style={{ cursor: 'pointer' }}
-                ></i>{" "}
-                {/* <i className="fa-regular fa-pen-to-square fa-lg"></i>{" "} */}
+            <div className="flex justify-end mt-4">
+              <div className='justify-center gap-2 flex'>
+
+                <div>
+                  {isLiked
+                  ? <FaHeart className='text-2xl text-red-500 hover:text-red-600 drop-shadow-sm' onClick={handleLikeClick} style={{ cursor: 'pointer' }}/>
+                  : <FaRegHeart className='text-2xl text-red-500 hover:text-red-600 drop-shadow-sm' onClick={handleLikeClick} style={{ cursor: 'pointer' }}/>
+
+                  }
+                </div>
+
                 <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-                  <i className="fa-brands fa-whatsapp fa-lg" style={{ cursor: 'pointer' }}></i>
-                </a>{" "}
+                  <FaWhatsapp className="text-2xl text-green-500 hover:text-green-600 drop-shadow-sm" style={{ cursor: 'pointer' }}></FaWhatsapp>
+                </a>
                 <a href={telegramUrl} target="_blank" rel="noopener noreferrer">
-                  <i className="fa-brands fa-telegram fa-lg" style={{ cursor: 'pointer' }}></i>
+                  <FaTelegram className="text-2xl text-cyan-600 hover:text-cyan-700 drop-shadow-sm" style={{ cursor: 'pointer' }}></FaTelegram>
+
                 </a>
               </div>
             </div>
