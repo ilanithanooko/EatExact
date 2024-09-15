@@ -44,17 +44,17 @@ const Settings = () => {
       const json = await response.json();
       if (response.ok) {
         if (json.length > 0) {
-            if (userData && userData.age) {
-              setUserType("family");
-            } else {
-              setUserType("justKids");
-            }
+          if (userData && userData.age) {
+            setUserType("family");
           } else {
-            setUserType("justMe");
+            setUserType("justKids");
           }
-          console.log("Individual's userType is:", userType);
-          console.log("Individual's userData is:", userData);
+        } else {
+          setUserType("justMe");
         }
+        console.log("Individual's userType is:", userType);
+        console.log("Individual's userData is:", userData);
+      }
     };
 
     const fetchMenus = async () => {
@@ -86,68 +86,82 @@ const Settings = () => {
             Settings
           </h3>
           <div className="text-lg mb-5 text-gray-700">
-            {userData && userData.role === "Individual" && userType === "justKids" && (
-              <>
-              <div>
-                <hr className="my-4"></hr>
-                <Collapsible trigger={"Edit your Children's Details"} transitionTime={1100}>
-                <SettingsForm
-                    toEdit={"children"}
-                    userData={userData}
-                />
-                </Collapsible>
-                <hr className="my-4"></hr>
-                </div>
-              </>
-            )}
-            {userData && userData.role === "Individual" && userType === "justMe" && (
-              <>
-              <div>
-                <Collapsible trigger={"Edit your Personal Details"} transitionTime={1300}>
-                <SettingsForm
-                    toEdit={"owner"}
-                    userData={userData}
-                />
-                </Collapsible>
-                <hr className="my-4"></hr>
-                </div>
-              </>
-            )}
-            {userData && userData.role === "Individual" && userType === "family" && (
-              <>
-              <div>
-                <Collapsible trigger={"Edit your Personal Details"} transitionTime={1300}>
-                <SettingsForm
-                    toEdit={"owner"}
-                    userData={userData}
-                />
-                </Collapsible>
-                <hr className="my-4"></hr>
-                <Collapsible trigger={"Edit your Children Details"} transitionTime={1100}>
-                <SettingsForm
-                    toEdit={"children"}
-                    userData={userData}
-                />
-                </Collapsible>
-                </div>
-              </>
-            )}
+            {userData &&
+              userData.role === "Individual" &&
+              userType === "justKids" && (
+                <>
+                  <div>
+                    <hr className="my-4"></hr>
+                    <Collapsible
+                      trigger={"Edit your Children's Details"}
+                      transitionTime={1100}
+                    >
+                      <SettingsForm toEdit={"children"} userData={userData} />
+                    </Collapsible>
+                    <hr className="my-4"></hr>
+                  </div>
+                </>
+              )}
+            {userData &&
+              userData.role === "Individual" &&
+              userType === "justMe" && (
+                <>
+                  <div>
+                    <Collapsible
+                      trigger={"Edit your Personal Details"}
+                      transitionTime={1300}
+                    >
+                      <SettingsForm toEdit={"owner"} userData={userData} />
+                    </Collapsible>
+                    <hr className="my-4"></hr>
+                  </div>
+                </>
+              )}
+            {userData &&
+              userData.role === "Individual" &&
+              userType === "family" && (
+                <>
+                  <div>
+                    <Collapsible
+                      trigger={"Edit your Personal Details"}
+                      transitionTime={1300}
+                    >
+                      <SettingsForm toEdit={"owner"} userData={userData} />
+                    </Collapsible>
+                    <hr className="my-4"></hr>
+                    <Collapsible
+                      trigger={"Edit your Children Details"}
+                      transitionTime={1100}
+                    >
+                      <SettingsForm toEdit={"children"} userData={userData} />
+                    </Collapsible>
+                  </div>
+                </>
+              )}
             {userData && userData.role === "Professional" && (
               <>
-              <div>
-                <Collapsible trigger={"Edit your Personal Details"} transitionTime={1300}>
-                <SettingsForm
-                    toEdit={"pro"}
-                    userData={userData}
-                />
-                </Collapsible>
-                <hr className="my-4"></hr>
-                <Collapsible trigger={"Edit your Menus Details"} transitionTime={1100}>
-                <SettingsForm
-                    toEdit={"menus"}
-                    userData={userData}
-                />
-                </Collapsible>
+                <div>
+                  <Collapsible
+                    trigger={"Edit your Personal Details"}
+                    transitionTime={1300}
+                  >
+                    <SettingsForm toEdit={"pro"} userData={userData} />
+                  </Collapsible>
+                  <hr className="my-4"></hr>
+                  <Collapsible
+                    trigger={"Edit your Menus Details"}
+                    transitionTime={1100}
+                  >
+                    <SettingsForm toEdit={"menus"} userData={userData} />
+                  </Collapsible>
+                </div>
+              </>
+            )}
+            {userData && userData.role === "Dietitian" && (
+              <>
+                <div>
+                  <SettingsForm toEdit={"patients"} userData={userData} />
+                  <hr className="my-4"></hr>
                 </div>
               </>
             )}

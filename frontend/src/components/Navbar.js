@@ -27,6 +27,9 @@ const Navbar = ({ userData }) => {
       if (userData.role === "Individual") {
         fetchChildren();
       }
+      if (userData.role === "Dietitian") {
+        
+      }
     }
   }, [userData]);
 
@@ -91,24 +94,37 @@ const Navbar = ({ userData }) => {
                   </Link>
                 </li>
                 <li>
-                  <button
-                    onClick={() => {
-                      if (isMobileMenuOpen) {
-                        toggleMobileMenu();
-                      }
+                  {userData && userData.role != "Dietitian" ? (
+                    <button
+                      onClick={() => {
+                        if (isMobileMenuOpen) {
+                          toggleMobileMenu();
+                        }
 
-                      if (userData.role === "Individual" && userType === "justMe") {
-                        navigate(`/entity/${userData._id}`, {
-                          state: { userData: userData },
-                        });
-                      } else {
-                        navigate("/saved-recipes");
-                      }
-                    }}
-                    className="w-full text-left text-lg hover:bg-pastel-green focus:outline-none text-white border-b border-gray-100 block pl-3 pr-4 py-2 md:hover:text-pastel-green md:hover:bg-transparent md:p-0 md:bg-transparent md:border-0"
-                  >
-                    Saved Recipes
-                  </button>
+                        if (
+                          userData.role === "Individual" &&
+                          userType === "justMe"
+                        ) {
+                          navigate(`/entity/${userData._id}`, {
+                            state: { userData: userData },
+                          });
+                        } else {
+                          navigate("/saved-recipes");
+                        }
+                      }}
+                      className="w-full text-left text-lg hover:bg-pastel-green focus:outline-none text-white border-b border-gray-100 block pl-3 pr-4 py-2 md:hover:text-pastel-green md:hover:bg-transparent md:p-0 md:bg-transparent md:border-0"
+                    >
+                      Saved Recipes
+                    </button>
+                  ) : (
+                    <Link
+                      onClick={isMobileMenuOpen ? toggleMobileMenu : () => {}}
+                      to="/my-patients"
+                      className="text-lg hover:bg-pastel-green focus:outline-none text-white border-b border-gray-100 block pl-3 pr-4 py-2 md:hover:text-pastel-green md:hover:bg-transparent md:p-0 md:bg-transparent md:border-0 "
+                    >
+                      My Patients
+                    </Link>
+                  )}
                 </li>
                 <li>
                   <Link

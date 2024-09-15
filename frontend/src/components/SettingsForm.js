@@ -2,13 +2,15 @@ import React, { useEffect, useState } from "react";
 import { FaPlus, FaTrash } from "react-icons/fa";
 import Collapsible from "react-collapsible";
 import FamilyMemberForm from "./FamilyMemberForm";
-import MenuForm from "./MenuForm"
+import MenuForm from "./MenuForm";
 import { useAuthContext } from "../hooks/useAuthContext";
+import PatientForm from "./PatientForm";
 
-const FamilySettingsForm = ({ toEdit, userData }) => {
+const SettingsForm = ({ toEdit, userData }) => {
   const [data, setData] = useState([]);
   const [children, setChildren] = useState([]);
   const [menus, setMenus] = useState([]);
+  const [patients, setPatients] = useState([]);
   const [ownerData, setOwnerData] = useState({
     firstName: userData.firstName,
     lastName: userData.lastName,
@@ -20,6 +22,7 @@ const FamilySettingsForm = ({ toEdit, userData }) => {
   const [sucessMessage, setSucessMessage] = useState("");
   const { user } = useAuthContext();
   const [error, setError] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
 
   const handleOwnerChange = (e) => {
     const { name, value } = e.target;
@@ -111,12 +114,36 @@ const FamilySettingsForm = ({ toEdit, userData }) => {
     }
   };
 
-    // Update menu data
-    const updateMenuData = async (event, id, index) => {
+  // Update menu data
+  const updateMenuData = async (event, id, index) => {
+    event.preventDefault();
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/menu/${id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
+          body: JSON.stringify(data[index]), // Update member data
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to update menu");
+      }
+      showSuccessMessage("Menu details updated successfully!");
+    } catch (error) {
+      showError(error.message);
+    }
+  };
+
+    // Update patient data
+    const updatePatientData = async (event, id, index) => {
       event.preventDefault();
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/api/menu/${id}`,
+          `${process.env.REACT_APP_API_URL}/api/patient/${id}`,
           {
             method: "PATCH",
             headers: {
@@ -127,9 +154,9 @@ const FamilySettingsForm = ({ toEdit, userData }) => {
           }
         );
         if (!response.ok) {
-          throw new Error("Failed to update menu");
+          throw new Error("Failed to update patient");
         }
-        showSuccessMessage("Menu details updated successfully!");
+        showSuccessMessage("Patient details updated successfully!");
       } catch (error) {
         showError(error.message);
       }
@@ -179,11 +206,53 @@ const FamilySettingsForm = ({ toEdit, userData }) => {
     }
   };
 
-    // Remove a menu and its saved recipes
-    const deleteMenu = async (event, id) => {
+  // Remove a menu and its saved recipes
+  const deleteMenu = async (event, id) => {
+    event.preventDefault();
+    try {
+      // Fetch saved recipes for this menu
+      const recipesResponse = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/recipes/${id}`,
+        {
+          method: "GET",
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+      const savedRecipes = await recipesResponse.json();
+      // Delete each saved recipe for the menu
+      if (savedRecipes.length > 0) {
+        for (const recipe of savedRecipes) {
+          await fetch(
+            `${process.env.REACT_APP_API_URL}/api/recipes/${recipe._id}`,
+            {
+              method: "DELETE",
+              headers: { Authorization: `Bearer ${user.token}` },
+            }
+          );
+        }
+      }
+      // delete menu
+      await fetch(`${process.env.REACT_APP_API_URL}/api/menu/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      // Update the state by removing the deleted member
+      setData((prevData) => prevData.filter((member) => member.id !== id));
+      setMenus((prevData) => prevData.filter((member) => member.id !== id));
+      showSuccessMessage("Menu & Its saved recipes removed successfully!");
+      setTimeout(async function () {
+        await fetchMenus(); // Fetch the updated family data
+      }, 5000);
+    } catch (error) {
+      showError("Failed to delete menu or its saved recipes");
+    }
+  };
+
+    // Remove a patient and their saved recipes
+    const deletePatient = async (event, id) => {
       event.preventDefault();
       try {
-        // Fetch saved recipes for this menu
+        // Fetch saved recipes for this patient
         const recipesResponse = await fetch(
           `${process.env.REACT_APP_API_URL}/api/recipes/${id}`,
           {
@@ -192,7 +261,7 @@ const FamilySettingsForm = ({ toEdit, userData }) => {
           }
         );
         const savedRecipes = await recipesResponse.json();
-        // Delete each saved recipe for the menu
+        // Delete each saved recipe for the patient
         if (savedRecipes.length > 0) {
           for (const recipe of savedRecipes) {
             await fetch(
@@ -204,22 +273,22 @@ const FamilySettingsForm = ({ toEdit, userData }) => {
             );
           }
         }
-        // delete menu
-        await fetch(`${process.env.REACT_APP_API_URL}/api/menu/${id}`, {
+        // delete patient
+        await fetch(`${process.env.REACT_APP_API_URL}/api/patient/${id}`, {
           method: "DELETE",
           headers: { Authorization: `Bearer ${user.token}` },
         });
         // Update the state by removing the deleted member
         setData((prevData) => prevData.filter((member) => member.id !== id));
-        setMenus((prevData) => prevData.filter((member) => member.id !== id));
+        setPatients((prevData) => prevData.filter((member) => member.id !== id));
         showSuccessMessage(
-          "Menu & Its saved recipes removed successfully!"
+          "patient & their saved recipes removed successfully!"
         );
         setTimeout(async function () {
-          await fetchMenus(); // Fetch the updated family data
+          await fetchPatients(); // Fetch the updated family data
         }, 5000);
       } catch (error) {
-        showError("Failed to delete menu or its saved recipes");
+        showError("Failed to delete patient or their saved recipes.");
       }
     };
 
@@ -291,6 +360,40 @@ const FamilySettingsForm = ({ toEdit, userData }) => {
     }
   };
 
+  const addPatient = async (event) => {
+    event.preventDefault();
+    try {
+      // Filter the members in `data` that are not present in `patients`
+      const newMembers = data.filter(
+        (member) => !patients.some((patient) => patient.id === member.id)
+      );
+      for (const member of newMembers) {
+        const familyResponse = await fetch(
+          `${process.env.REACT_APP_API_URL}/api/patient`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${user.token}`,
+            },
+            body: JSON.stringify({ ...member }),
+          }
+        );
+        if (!familyResponse.ok) {
+          throw new Error("Failed to add patient");
+        } else {
+          showSuccessMessage("Patient added successfully!");
+          // Re-fetch the data after successfully adding the Patient
+          setTimeout(async function () {
+            await fetchPatients(); // Fetch the updated patients
+          }, 3000);
+        }
+      }
+    } catch (error) {
+      showError(error.message);
+    }
+  };
+
   const fetchChildren = async () => {
     try {
       const response = await fetch(
@@ -317,9 +420,25 @@ const FamilySettingsForm = ({ toEdit, userData }) => {
       );
       const data = await response.json();
       setData(data);
-      setMenus(data) // used to distinguish between menus fron DB & Added menus
+      setMenus(data); // used to distinguish between menus fron DB & Added menus
     } catch (error) {
       console.error("Failed to fetch menus data:", error);
+    }
+  };
+
+  const fetchPatients = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/patient`,
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+      const data = await response.json();
+      setData(data);
+      setPatients(data); // used to distinguish between patients fron DB & Added patients
+    } catch (error) {
+      console.error("Failed to fetch patients data:", error);
     }
   };
 
@@ -329,6 +448,9 @@ const FamilySettingsForm = ({ toEdit, userData }) => {
     }
     if (userData.role === "Professional") {
       fetchMenus();
+    }
+    if (userData.role === "Dietitian") {
+      fetchPatients();
     }
   }, [userData]);
 
@@ -349,6 +471,24 @@ const FamilySettingsForm = ({ toEdit, userData }) => {
   const removeMember = (id) => {
     setData((prevMembers) => prevMembers.filter((member) => member.id !== id));
   };
+
+  let filteredData = data;
+
+if (toEdit === 'patients' && searchTerm) {
+  const searchLower = searchTerm.toLowerCase();
+  filteredData = data.filter((member) => {
+    return (
+      (member.firstName && member.firstName.toLowerCase().includes(searchLower)) ||
+      (member.lastName && member.lastName.toLowerCase().includes(searchLower)) ||
+      (member.id && member.id.toString().toLowerCase().includes(searchLower)) ||
+      (member.age && member.age.toString().includes(searchLower)) ||
+      (member.dietaryRestrictions && member.dietaryRestrictions.toLowerCase().includes(searchLower)) ||
+      (member.favoriteIngredients && member.favoriteIngredients.toLowerCase().includes(searchLower)) ||
+      (member.unlikedIngredients && member.unlikedIngredients.toLowerCase().includes(searchLower))
+    );
+  });
+}
+
 
   return (
     <div>
@@ -615,34 +755,32 @@ const FamilySettingsForm = ({ toEdit, userData }) => {
             <div className="lg:col-span-1">
               <hr className="my-1"></hr>
               <form onSubmit={updateOwnerData} className="space-y-4">
-                
-                  <div>
-                    <label className="block text-lg">First Name</label>
-                    <input
-                      type="text"
-                      name="firstName"
-                      value={
-                        ownerData.firstName.charAt(0).toUpperCase() +
-                        ownerData.firstName.slice(1)
-                      }
-                      onChange={handleOwnerChange}
-                      className="w-full p-2 border border-gray-300 rounded"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-lg">Last Name</label>
-                    <input
-                      type="text"
-                      name="lastName"
-                      value={
-                        ownerData.lastName.charAt(0).toUpperCase() +
-                        ownerData.lastName.slice(1)
-                      }
-                      onChange={handleOwnerChange}
-                      className="w-full p-2 border border-gray-300 rounded"
-                    />
-                  </div>
-                
+                <div>
+                  <label className="block text-lg">First Name</label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={
+                      ownerData.firstName.charAt(0).toUpperCase() +
+                      ownerData.firstName.slice(1)
+                    }
+                    onChange={handleOwnerChange}
+                    className="w-full p-2 border border-gray-300 rounded"
+                  />
+                </div>
+                <div>
+                  <label className="block text-lg">Last Name</label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={
+                      ownerData.lastName.charAt(0).toUpperCase() +
+                      ownerData.lastName.slice(1)
+                    }
+                    onChange={handleOwnerChange}
+                    className="w-full p-2 border border-gray-300 rounded"
+                  />
+                </div>
 
                 <div className="flex flex-col justify-center">
                   <div>
@@ -699,7 +837,7 @@ const FamilySettingsForm = ({ toEdit, userData }) => {
                             className="w-full p-2 border border-gray-300 rounded"
                           />
                         </div>
-                        
+
                         <div className="flex flex-col justify-center">
                           <div className="flex gap-2">
                             <button
@@ -772,9 +910,198 @@ const FamilySettingsForm = ({ toEdit, userData }) => {
                   className="bg-green-600 text-white flex items-center justify-center py-2 px-4 rounded-md mt-2"
                 >
                   <FaPlus className="text-lg" />
-                  <span className="ml-2 text-lg">
-                    Add Another Menu
-                  </span>
+                  <span className="ml-2 text-lg">Add Another Menu</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        {toEdit === "patients" && (
+          <div className="grid grid-cols-1 lg:grid-cols-3">
+            <div className="lg:col-span-1">
+              <hr className="my-1"></hr>
+              <div className="my-4">
+                <label className="block text-lg">Search Patients</label>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded"
+                  placeholder="Search by name, ID, or other attributes"
+                />
+              </div>
+              {filteredData.map((member, index) => (
+                <div>
+                  <Collapsible
+                    key={index}
+                    trigger={ member.id && member.firstName && member.lastName ? 
+                      member.id +
+                        " " +
+                        member.firstName +
+                        " " +
+                        member.lastName : "Patient " + (index + 1)
+                    }
+                    open={index + 1 > patients.length}
+                    transitionTime={1300}
+                  >
+                    {index < patients.length ? (
+                      <form onSubmit={(e) => updatePatientData(e, member._id, index)} className="space-y-4">
+                        <div className="grid grid-cols-2 gap-x-4 mt-2">
+                          <div>
+                            <label className="block text-lg">First Name</label>
+                            <input
+                              type="text"
+                              name="firstName"
+                              value={member.firstName}
+                              onChange={(e) => handleEntityChange(e, index)}
+                              className="w-full p-2 border border-gray-300 rounded"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-lg">Last Name</label>
+                            <input
+                              type="text"
+                              name="lastName"
+                              value={member.lastName}
+                              onChange={(e) => handleEntityChange(e, index)}
+                              className="w-full p-2 border border-gray-300 rounded"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-lg">ID</label>
+                          <input
+                            type="text"
+                            name="id"
+                            value={member.id}
+                            onChange={(e) => handleEntityChange(e, index)}
+                            className="w-full p-2 border border-gray-300 rounded"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-lg">Age</label>
+                          <input
+                            type="number"
+                            name="age"
+                            value={member.age}
+                            onChange={(e) => handleEntityChange(e, index)}
+                            className="w-full p-2 border border-gray-300 rounded"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-lg">
+                            Dietary Restrictions
+                          </label>
+                          <input
+                            type="text"
+                            name="dietaryRestrictions"
+                            value={member.dietaryRestrictions}
+                            onChange={(e) => handleEntityChange(e, index)}
+                            className="w-full p-2 border border-gray-300 rounded"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-lg">
+                            Preferred Ingredients
+                          </label>
+                          <input
+                            type="text"
+                            name="favoriteIngredients"
+                            value={member.favoriteIngredients}
+                            onChange={(e) => handleEntityChange(e, index)}
+                            className="w-full p-2 border border-gray-300 rounded"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-lg">
+                            Avoid These Ingredients
+                          </label>
+                          <input
+                            type="text"
+                            name="unlikedIngredients"
+                            value={member.unlikedIngredients}
+                            onChange={(e) => handleEntityChange(e, index)}
+                            className="w-full p-2 border border-gray-300 rounded"
+                          />
+                        </div>
+                        <div className="flex flex-col justify-center">
+                          <div className="flex gap-2">
+                            <button
+                              type="submit"
+                              className={`bg-green-600 text-white flex items-center justify-center py-2 px-4 rounded-md mt-2`}
+                            >
+                              Update Details
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => deletePatient(e, member._id)}
+                              className="bg-red-500 text-white flex items-center justify-center py-2 px-4 rounded-md mt-2"
+                            >
+                              <FaTrash className="text-lg" />
+                              <span className="ml-1">Delete Patient</span>
+                            </button>
+                          </div>
+                          {error && (
+                            <div className="mt-2">
+                              <p className="text-red-500">{error}</p>
+                            </div>
+                          )}
+                          {sucessMessage && (
+                            <div className="mt-2">
+                              <p className="text-green-500">{sucessMessage}</p>
+                            </div>
+                          )}
+                        </div>
+                      </form>
+                    ) : (
+                      <div>
+                        <PatientForm
+                          member={member}
+                          onChange={(data) =>
+                            handleMemberChange(member.id, data)
+                          }
+                          onRemove={() => removeMember(member.id)}
+                          onAdd={(e) => {
+                            if (
+                              data[index].firstName &&
+                              data[index].lastName &&
+                              data[index].age
+                            ) {
+                              addPatient(e);
+                            } else {
+                              showError("Please fill full name and age");
+                            }
+                          }}
+                        />
+                        <div className="flex flex-col justify-center">
+                          {error && (
+                            <div className="mt-2 text-center">
+                              <p className="text-red-500">{error}</p>
+                            </div>
+                          )}
+                          {sucessMessage && (
+                            <div className="mt-2 text-center">
+                              <p className="text-green-500">{sucessMessage}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </Collapsible>
+                  <hr className="my-2"></hr>
+                </div>
+              ))}
+              <div className="flex justify-center my-4 gap-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchTerm("");
+                    addAnotherMember();
+                  }}
+                  className="bg-green-600 text-white flex items-center justify-center py-2 px-4 rounded-md mt-2"
+                >
+                  <FaPlus className="text-lg" />
+                  <span className="ml-2 text-lg">Add Another Patient</span>
                 </button>
               </div>
             </div>
@@ -785,4 +1112,4 @@ const FamilySettingsForm = ({ toEdit, userData }) => {
   );
 };
 
-export default FamilySettingsForm;
+export default SettingsForm;

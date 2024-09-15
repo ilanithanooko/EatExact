@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLogin } from "../hooks/useLogin";
 import salad from "../assets/salad.png";
-import foodBar from "../assets/foodBar.png";
 import { Link } from "react-router-dom";
 
 const Login = () => {
@@ -19,20 +18,6 @@ const Login = () => {
   function handleCallbackResponse(response) {
     console.log("Encoded JWT ID token:" + response.credential);
   }
-
-  useEffect(() => {
-    /* global google */
-
-    google.accounts.id.initialize({
-      client_id: clientId,
-      callback: handleCallbackResponse,
-    });
-
-    google.accounts.id.renderButton(
-      document.getElementById("googleLoginButton"),
-      { theme: "outline", size: "large" }
-    );
-  }, []);
 
   return (
     // <div className="bg-gradient-to-bl from-green-darkest to-green-600">
@@ -103,9 +88,6 @@ const Login = () => {
                   Sign In
                 </button>
               </div>
-              {/* <div className="flex justify-center items-center ">
-                <div id="googleLoginButton"></div>
-              </div> */}
               {error && <div className="text-red-800">{error}</div>}
             </form>
             <p className="mt-8 text-center text-lg xl:text-xl text-white">

@@ -221,7 +221,6 @@ const EntityRecipes = () => {
       console.error('Failed to update recipe');
     }
   };
-  
 
   return (
     <div className="px-5 xl:px-8">
@@ -334,6 +333,7 @@ const EntityRecipes = () => {
             tips={recipeData.tips}
             handleRecipeChange={(e)=>{handleRecipeChange(e)}}
             handleSave={()=>{handleSave()}}
+            
           />
           </div>
         </div>

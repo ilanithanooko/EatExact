@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useAuthContext } from "../hooks/useAuthContext";
 
 const EditRecipe = ({
   title,
@@ -9,6 +10,9 @@ const EditRecipe = ({
   handleRecipeChange,
   handleSave,
 }) => {
+  const { user } = useAuthContext();
+
+
   return (
     <div className="">
         <h3 className="text-center text-xl md:text-2xl mb-4 text-green-800 font-semibold">
@@ -23,7 +27,7 @@ const EditRecipe = ({
           If you notice an ingredient you don't like, feel free to update your preferences<br/>in the <Link className="font-semibold hover:text-gray-600" to="/settings">Settings</Link> section to ensure future recipes match your taste.
         </div>
       <div>
-        <label className="block text-lg font-semibold">Recipe Title</label>
+        <label className="block text-lg font-semibold text-green-800">Recipe Title</label>
         <textarea
           name="title"
           value={title}
@@ -33,7 +37,7 @@ const EditRecipe = ({
         />
       </div>
       <div>
-        <label className="block text-lg font-semibold">Ingredients</label>
+        <label className="block text-lg font-semibold text-green-800">Ingredients</label>
         <textarea
           name="ingredients"
           value={ingredients}
@@ -43,7 +47,7 @@ const EditRecipe = ({
         />
       </div>
       <div>
-        <label className="block text-lg font-semibold">Instructions</label>
+        <label className="block text-lg font-semibold text-green-800">Instructions</label>
         <textarea
           name="instructions"
           value={instructions}
@@ -53,7 +57,7 @@ const EditRecipe = ({
         />
       </div>
       <div>
-        <label className="block text-lg font-semibold">Tips</label>
+        <label className="block text-lg font-semibold text-green-800">Tips</label>
         <textarea
           name="tips"
           value={tips}

@@ -45,6 +45,7 @@ const ProfileSetup = ({onUserDataChange}) => {
       if (!response.ok) {
         throw new Error("Failed to update owner information");
       }
+      onUserDataChange()
       navigate("/my-patients");
       // Redirect or show success message
     } catch (error) {

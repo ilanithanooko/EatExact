@@ -7,6 +7,7 @@ const axios = require('axios');
 const recipeRoutes = require("./routes/recipes");
 const userRoutes = require("./routes/users");
 const familyMemberRoutes = require("./routes/familyMembers");
+const patientRoutes = require("./routes/patients");
 const menuRoutes = require("./routes/menus");
 
 const apiKey = process.env.OPENAI_API_KEY;
@@ -44,6 +45,7 @@ app.get('/', (req, res) => {
 app.use("/api/recipes", recipeRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/familyMember", familyMemberRoutes);
+app.use("/api/patient", patientRoutes);
 app.use("/api/menu", menuRoutes);
 
 

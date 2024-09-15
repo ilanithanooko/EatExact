@@ -13,6 +13,7 @@ import EntityRecipes from "./pages/EntityRecipes";
 import Response from "./pages/response";
 import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
+import MyPatients from "./pages/myPatients";
 
 function App() {
   const { user } = useAuthContext();
@@ -111,6 +112,10 @@ function App() {
             <Route
               path="/saved-recipes"
               element={user ? <SavedRecipes /> : <Navigate to="/login" />}
+            />
+                        <Route
+              path="/my-patients"
+              element={user ? <MyPatients /> : <Navigate to="/login" />}
             />
             <Route
               path="/settings"
