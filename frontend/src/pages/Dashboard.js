@@ -236,10 +236,11 @@ const Dashboard = () => {
   ]);
 
   const handleChildSelect = (selection) => {
+    console.log("selection is:",selection)
     if (selection !== userData.firstName) {
       setSelectedChild(selection);
     } else {
-      setSelectedChild(userData);
+      setSelectedChild(userData.firstName);
     }
   };
 
@@ -309,7 +310,14 @@ const Dashboard = () => {
         generateRecipePrompt();
       }
     } else {
-      if (!category || !selectedChild) {
+      if(userType === "justMe"){
+        if(!category){
+          showError();
+        } else {
+          generateRecipePrompt();
+        }
+
+      } else if (!category || !selectedChild) {
         showError();
       } else {
         generateRecipePrompt();
