@@ -105,7 +105,7 @@ const Signup = () => {
                   id="password"
                   name="password"
                   type="password"
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {setPassword(e.target.value)}}
                   value={password}
                   autoComplete="current-password"
                   placeholder="Enter your password"
@@ -127,7 +127,7 @@ const Signup = () => {
             {/* <div className="flex justify-center items-center ">
                 <div id="googleLoginButton"></div>
               </div> */}
-            {error && <div className="text-red-800">{error}</div>}
+            {error && <div className="text-red-800 font-semibold drop-shadow-sm bg-opacity-40 bg-white p-2 rounded-md">{error}</div>}
           </form>
           <p className="mt-8 text-center text-lg xl:text-xl text-white">
             Already a member?{" "}
