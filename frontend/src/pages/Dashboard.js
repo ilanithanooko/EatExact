@@ -448,7 +448,13 @@ const Dashboard = () => {
           },
         });
       } catch (error) {
-        console.error("Error:", error.message);
+        if (error.response) {
+          console.error("Error response:", error.response.data);
+        } else if (error.request) {
+          console.error("Error request:", error.request);
+        } else {
+          console.error("Error message:", error.message);
+        }
       }
     }
 
