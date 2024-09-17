@@ -69,9 +69,12 @@ app.post('/api/chat', async (req, res) => {
   };
 
   try {
-      const response = await axios.post(url, data, { headers });
-      const result = response.data.choices[0].message.content;
-      res.json({ result });
+    const response = await axios.post(url, data, {
+      headers,
+      timeout: 15000, // Set a 10-second timeout
+    });
+    const result = response.data.choices[0].message.content;
+    res.json({ result });
   } catch (error) {
     console.error("Error calling ChatGPT API:", error);
     console.error("Error response data:", error.response ? error.response.data : "No response data");
