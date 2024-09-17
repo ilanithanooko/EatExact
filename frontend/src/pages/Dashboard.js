@@ -29,6 +29,8 @@ const Dashboard = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [error, setError] = useState(false);
+  const [wrongmsg, setWrongmsg] = useState(false);
+
 
   const navigate = useNavigate();
 
@@ -296,6 +298,17 @@ const Dashboard = () => {
     }, 5000);
   };
 
+  const showloading = () => {
+    setLoading(true);
+    setTimeout(function () {
+      setLoading(false);
+      setWrongmsg(true);
+      setTimeout(function () {
+        setWrongmsg(false);
+      }, 5000);
+    }, 15000);
+  };
+
   const handleButtonClick = () => {
     if (userType === "pro") {
       if (!category || !selectedMenu) {
@@ -326,7 +339,7 @@ const Dashboard = () => {
   };
   
   async function generateRecipePrompt() {
-    setLoading(true);
+    showloading();
     const selectedCategory = category || categoryInput;
 
     const individualPropmt = (selectedCategory, selectedData) => {
@@ -696,6 +709,9 @@ case "dietitian": {
           <div className="flex justify-center pt-2">
             {error && (
               <div className="text-red-800">Forgot to Choose Something?</div>
+            )}
+            {wrongmsg && (
+              <div className="text-red-800">Something went wrong... Try again later</div>
             )}
           </div>
         </>
