@@ -47,6 +47,7 @@ app.use("/api/familyMember", familyMemberRoutes);
 app.use("/api/patient", patientRoutes);
 app.use("/api/menu", menuRoutes);
 
+app.options('*', cors());  // Handle preflight requests globally for all routes
 
 // call chatGPT API
 app.post('/api/chat', async (req, res) => {
@@ -71,8 +72,6 @@ app.post('/api/chat', async (req, res) => {
       const response = await axios.post(url, data, { headers });
       const result = response.data.choices[0].message.content;
       res.json({ result });
-      // res.json({ prompt });
-
   } catch (error) {
     console.error("Error calling ChatGPT API:", error);
     console.error("Error response data:", error.response ? error.response.data : "No response data");
