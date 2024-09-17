@@ -435,6 +435,7 @@ const Dashboard = () => {
           { prompt },
           {
             headers: { Authorization: `Bearer ${user.token}` },
+            timeout: 15000, // 15 seconds timeout
           }
         );
         console.log(response.data.result);

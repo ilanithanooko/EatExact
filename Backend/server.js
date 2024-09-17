@@ -71,7 +71,7 @@ app.post('/api/chat', async (req, res) => {
   try {
     const response = await axios.post(url, data, {
       headers,
-      timeout: 15000, // Set a 10-second timeout
+      timeout: 10000, // Set a 10-second timeout
     });
     const result = response.data.choices[0].message.content;
     res.json({ result });
