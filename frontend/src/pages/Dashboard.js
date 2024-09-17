@@ -202,38 +202,38 @@ const Dashboard = () => {
     }
   }, [userData]);
 
-  // useEffect(() => {
-  //   //used for debugging
-  //   if (selectedChild) {
-  //     console.log("Selected Child:", selectedChild);
-  //   }
-  //   if (selectedMenu) {
-  //     console.log("Selected Menu:", selectedMenu);
-  //   }
-  //   if (category) {
-  //     console.log("Selected category:", category);
-  //   }
-  //   if (avoiding) {
-  //     console.log("Selected avoiding:", avoiding);
-  //   }
-  //   if (restrictions) {
-  //     console.log("Selected restrictions:", restrictions);
-  //   }
-  //   if (gridColumns) {
-  //     console.log("grid cols:", gridColumns);
-  //   }
-  //   if (userType) {
-  //     console.log("User Type is:", userType);
-  //   }
-  // }, [
-  //   selectedChild,
-  //   selectedMenu,
-  //   category,
-  //   avoiding,
-  //   restrictions,
-  //   userType,
-  //   gridColumns,
-  // ]);
+  useEffect(() => {
+    //used for debugging
+    if (selectedChild) {
+      console.log("Selected Child:", selectedChild);
+    }
+    if (selectedMenu) {
+      console.log("Selected Menu:", selectedMenu);
+    }
+    if (category) {
+      console.log("Selected category:", category);
+    }
+    if (avoiding) {
+      console.log("Selected avoiding:", avoiding);
+    }
+    if (restrictions) {
+      console.log("Selected restrictions:", restrictions);
+    }
+    if (gridColumns) {
+      console.log("grid cols:", gridColumns);
+    }
+    if (userType) {
+      console.log("User Type is:", userType);
+    }
+  }, [
+    selectedChild,
+    selectedMenu,
+    category,
+    avoiding,
+    restrictions,
+    userType,
+    gridColumns,
+  ]);
 
   const handleChildSelect = (selection) => {
     if (selection !== userData.firstName) {
@@ -317,7 +317,6 @@ const Dashboard = () => {
     }
   };
   
-
   async function generateRecipePrompt() {
     setLoading(true);
     const selectedCategory = category || categoryInput;
@@ -430,7 +429,6 @@ const Dashboard = () => {
       } catch (error) {
         console.error("Error:", error.message);
       }
-      console.log("generated prompt:", prompt)
     }
 
     console.log(userType);
@@ -446,7 +444,7 @@ const Dashboard = () => {
         break;
       case "family":
         {
-          if (selectedChild.name) {
+          if (selectedChild != userData.firstName) {
             const selectedChildDetails = children.find(
               (child) => child.name === selectedChild
             );
