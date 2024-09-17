@@ -22,9 +22,8 @@ app.use((req, res, next) => {
   next();
 });
 
-
 // Enable CORS for all routes
-const allowedOrigins = ['https://eat-exact-frontend.vercel.app', 'http://localhost:3000'];
+const allowedOrigins = ['https://eat-exact-frontend.vercel.app', 'https://eat-exact-server.vercel.app', 'http://localhost:3000'];
 
 app.use(cors({
   origin: function(origin, callback) {
