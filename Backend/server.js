@@ -47,7 +47,7 @@ app.use("/api/familyMember", familyMemberRoutes);
 app.use("/api/patient", patientRoutes);
 app.use("/api/menu", menuRoutes);
 
-app.options('*', cors());  // Handle preflight requests globally for all routes
+// app.options('*', cors());  // Handle preflight requests globally for all routes
 
 // call chatGPT API
 app.post('/api/chat', async (req, res) => {
