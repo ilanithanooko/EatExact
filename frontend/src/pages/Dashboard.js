@@ -34,6 +34,7 @@ const Dashboard = () => {
 
   const navigate = useNavigate();
 
+  // Predefined categories, restrictions, and lifestyles for selection
   const categoriesArray = [
     "Appetizers",
     "Salads",
@@ -87,6 +88,7 @@ const Dashboard = () => {
     "Low-fat",
   ];
 
+  // Fetch logged-in user data from the backend
   const fetchUserData = async () => {
     try {
       const response = await fetch(
@@ -103,6 +105,7 @@ const Dashboard = () => {
     }
   };
 
+  // Fetch family member data if user is an Individual
   const fetchChildren = async () => {
     try {
       const response = await fetch(
@@ -112,8 +115,9 @@ const Dashboard = () => {
         }
       );
       const data = await response.json();
-      setChildren(data);
-      setLoading(false);
+      setChildren(data); // Set family members
+      setLoading(false); // Stop loading
+      // Set user type based on the presence of children or user data
       if (data.length > 0) {
         if (userData && userData.age) {
           setUserType("family");
@@ -125,10 +129,11 @@ const Dashboard = () => {
       }
     } catch (error) {
       console.error("Failed to fetch children data:", error);
-      setLoading(false);
+      setLoading(false); // Stop loading
     }
   };
 
+  // Fetch menu data if user is a Professional
   const fetchMenus = async () => {
     try {
       const response = await fetch(
@@ -138,15 +143,16 @@ const Dashboard = () => {
         }
       );
       const data = await response.json();
-      setMenus(data);
-      setUserType("pro");
-      setLoading(false);
+      setMenus(data); // Set restaurant menus
+      setUserType("pro"); // Set user type as Professional
+      setLoading(false); // Stop loading
     } catch (error) {
       console.error("Failed to fetch menus data:", error);
-      setLoading(false);
+      setLoading(false); // Stop loading
     }
   };
 
+  // Fetch patient data if user is a Dietitian
   const fetchPatients = async () => {
     try {
       const response = await fetch(
@@ -156,17 +162,17 @@ const Dashboard = () => {
         }
       );
       const data = await response.json();
-      setPatients(data);
+      setPatients(data); // Set patients
       setFilteredPatients(data); // Initialize filteredPatients
-      setUserType("dietitian");
-      setLoading(false);
+      setUserType("dietitian"); // Set user type as Dietitian
+      setLoading(false); // Stop loading
     } catch (error) {
       console.error("Failed to fetch menus data:", error);
-      setLoading(false);
+      setLoading(false); // Stop loading
     }
   };
 
-  // Update gridColumns after userType is set
+  // Dynamically update grid structure based on user type and data length
   useEffect(() => {
     if (userType && userData.role === "Individual" && children.length) {
       setGridColumns(
@@ -187,12 +193,13 @@ const Dashboard = () => {
     }
   }, [userType, children, menus]);
 
+  // Fetch user data when component mounts
   useEffect(() => {
     fetchUserData();
   }, [user.token]);
 
+  // Fetch appropriate data based on user role
   useEffect(() => {
-    // fetch appropriate data according to role
     if (userData) {
       if (userData.role === "Individual") {
         fetchChildren();
@@ -204,39 +211,7 @@ const Dashboard = () => {
     }
   }, [userData]);
 
-  useEffect(() => {
-    //used for debugging
-    if (selectedChild) {
-      console.log("Selected Child:", selectedChild);
-    }
-    if (selectedMenu) {
-      console.log("Selected Menu:", selectedMenu);
-    }
-    if (category) {
-      console.log("Selected category:", category);
-    }
-    if (avoiding) {
-      console.log("Selected avoiding:", avoiding);
-    }
-    if (restrictions) {
-      console.log("Selected restrictions:", restrictions);
-    }
-    if (gridColumns) {
-      console.log("grid cols:", gridColumns);
-    }
-    if (userType) {
-      console.log("User Type is:", userType);
-    }
-  }, [
-    selectedChild,
-    selectedMenu,
-    category,
-    avoiding,
-    restrictions,
-    userType,
-    gridColumns,
-  ]);
-
+  // Handle selection of a child (Individual user)
   const handleChildSelect = (selection) => {
     console.log("selection is:",selection)
     if (selection !== userData.firstName) {
@@ -246,10 +221,12 @@ const Dashboard = () => {
     }
   };
 
+  // Handle selection of a menu (Professional user)
   const handleMenuSelect = (selection) => {
     setSelectedMenu(selection);
   };
 
+  // Handle search input for patients (Dietitian user)
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
@@ -268,29 +245,32 @@ const Dashboard = () => {
     }
   };
   
-
+  // Handle patient selection from the filtered dropdown list
   const handlePatientSelect = (selection) => {
     console.log("Selection:", selection); // Debugging
     const selectedPatientId = selection.value;
-    const patient = patients.find((patient) => patient.id === selectedPatientId);
+    const patient = patients.find((patient) => patient.id === selectedPatientId); // Find the patient based on ID
     setSelectedPatient(patient);
-    console.log("Selected patient:", patient);
+    console.log("Selected patient:", patient); // Debugging
   };
   
-  
+  // Handle category selection
   const handleCategorySelect = (selectedCategory, selectedOptions) => {
     setCategory(selectedCategory);
     setCategoryInput(""); // Clear input if a category is selected
   };
 
+  // Handle avoiding ingredient selection
   const handleAvoidingSelect = (selectedAvoiding, selectedOptions) => {
     setAvoiding(selectedOptions);
   };
 
+  // Handle lifestyle selection
   const handleLifestyleSelect = (selectedLifestyle, selectedOptions) => {
     setRestrictions(selectedOptions);
   };
 
+  // Show error message when required selections are missing
   const showError = () => {
     setError(true);
     setTimeout(function () {
@@ -298,50 +278,54 @@ const Dashboard = () => {
     }, 5000);
   };
 
+  // Show loading state and simulate loading for recipe generation
   const showloading = () => {
-    setLoading(true);
+    setLoading(true); // Set loading state to true to show loading spinner
+  setTimeout(function () {
+    setLoading(false); // Stop loading after 15 seconds
+    setWrongmsg(true); // Display "something went wrong" message
     setTimeout(function () {
-      setLoading(false);
-      setWrongmsg(true);
-      setTimeout(function () {
-        setWrongmsg(false);
-      }, 5000);
-    }, 15000);
+      setWrongmsg(false); // Hide the wrong message after 5 seconds
+    }, 5000);
+  }, 15000);
   };
 
+  // Handle the button click event to generate a recipe based on user inputs
   const handleButtonClick = () => {
     if (userType === "pro") {
       if (!category || !selectedMenu) {
-        showError();
+        showError(); // Show error if category or menu is not selected
       } else {
-        generateRecipePrompt();
+        generateRecipePrompt(); // Proceed to generate recipe prompt
       }
     } else if (userType === "dietitian") {
       if (!category || !selectedPatient) {
-        showError();
+        showError(); // Show error if category or patient is not selected
       } else {
-        generateRecipePrompt();
+        generateRecipePrompt(); // Proceed to generate recipe prompt
       }
     } else {
       if(userType === "justMe"){
         if(!category){
-          showError();
+          showError(); // Show error if category is not selected
         } else {
-          generateRecipePrompt();
+          generateRecipePrompt(); // Proceed to generate recipe prompt
         }
 
       } else if (!category || !selectedChild) {
-        showError();
+        showError(); // Show error if category or child is not selected
       } else {
-        generateRecipePrompt();
+        generateRecipePrompt(); // Proceed to generate recipe prompt
       }
     }
   };
   
+  // Function to generate a recipe prompt based on the user's selection and role
   async function generateRecipePrompt() {
-    showloading();
+    showloading(); // Display loading spinner during recipe generation
     const selectedCategory = category || categoryInput;
 
+    // Generate recipe prompt for individual users
     const individualPropmt = (selectedCategory, selectedData) => {
       const prompt = `
       Generate a recipe for the category: ${selectedCategory} for a ${
@@ -369,6 +353,7 @@ const Dashboard = () => {
       return prompt;
     };
 
+    // Generate recipe prompt for professional users
     const professionalPropmt = (selectedCategory) => {
       const prompt = `
       I’m a professional chef looking to create a recipe for my restaurant that caters to individuals with specific dietary restrictions.
@@ -392,6 +377,7 @@ const Dashboard = () => {
       return prompt;
     };
 
+    // Generate recipe prompt for dietitian user
     const dietitianPrompt = (selectedCategory, patientData) => {
       const prompt = `
         As a professional dietitian, I need to create a personalized recipe for my patient.
@@ -427,7 +413,7 @@ const Dashboard = () => {
       return prompt;
     };
     
-
+    // Function to call the AI API for recipe generation
     async function callAiAPI(prompt, selectionData) {
       try {
         const response = await axios.post(
@@ -435,7 +421,7 @@ const Dashboard = () => {
           { prompt },
           {
             headers: { Authorization: `Bearer ${user.token}` },
-            timeout: 15000, // 15 seconds timeout
+            timeout: 15000, // Set timeout for 15 seconds
           }
         );
         console.log(response.data.result);
@@ -446,9 +432,10 @@ const Dashboard = () => {
             selectedCategory,
             apiResponse: response.data.result,
             selectionData,
-          },
+          }, // Navigate to the response page
         });
       } catch (error) {
+        // Handle errors in API call
         if (error.response) {
           console.error("Error response:", error.response.data);
         } else if (error.request) {
@@ -459,8 +446,7 @@ const Dashboard = () => {
       }
     }
 
-    console.log(userType);
-
+    // Determine the user type and generate the appropriate recipe prompt
     switch (userType) {
       case "justMe":
         {

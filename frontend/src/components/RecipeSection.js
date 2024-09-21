@@ -2,6 +2,7 @@ import React from "react";
 import { FaTrash } from "react-icons/fa";
 import { FaPenToSquare } from "react-icons/fa6";
 
+// RecipeSection component for each recipe on the entity recipe page
 const RecipeSection = ({
   recipe,
   onRecipeClick,
@@ -60,4 +61,3 @@ const RecipeSection = ({
 };
 
 export default RecipeSection;
-

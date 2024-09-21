@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../hooks/useAuthContext";
-import { BiSolidFoodMenu } from "react-icons/bi";
-
 
 const MyPatients = () => {
   const [patients, setPatients] = useState([]);
@@ -13,81 +11,81 @@ const MyPatients = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
 
-  // Fetch patients data on component mount
-  useEffect(() => {
-    const fetchPatients = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/api/patient`,
-          {
-            headers: { Authorization: `Bearer ${user.token}` },
-          }
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch patients");
+ // Fetch patients and user data when the component mounts
+ useEffect(() => {
+  const fetchPatients = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/patient`, // Fetching patients data from API
+        {
+          headers: { Authorization: `Bearer ${user.token}` }, // Authorization header with user's token
         }
-        const data = await response.json();
-        setPatients(data);
-        setFilteredPatients(data);
-        console.log("patients:", patients);
-      } catch (err) {
-        setError(err.message);
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch patients"); // Handle failure to fetch patients
       }
-    };
-
-    const fetchUserData = async () => {
-      try {
-        if (user?.token) {
-          // Check if user and token exist
-          const response = await fetch(
-            `${process.env.REACT_APP_API_URL}/api/user/${user.email}`,
-            {
-              method: "GET",
-              headers: { Authorization: `Bearer ${user.token}` },
-            }
-          );
-          const data = await response.json();
-          setUserData(data);
-          console.log("user data:", data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch user data:", error);
-      }
-    };
-
-    fetchPatients();
-    fetchUserData();
-  }, [user.token]);
-
-  // Handle search input change
-  const handleSearch = (e) => {
-    const searchValue = e.target.value;
-    setSearchTerm(searchValue);
-
-    if (searchValue) {
-      const searchLower = searchValue.toLowerCase();
-      const filtered = patients.filter((patient) => {
-        return (
-          (patient.firstName &&
-            patient.firstName.toLowerCase().includes(searchLower)) ||
-          (patient.lastName &&
-            patient.lastName.toLowerCase().includes(searchLower)) ||
-          (patient.id &&
-            patient.id.toString().toLowerCase().includes(searchLower)) ||
-          (patient.age && patient.age.toString().includes(searchLower)) ||
-          (patient.dietaryRestrictions &&
-            patient.dietaryRestrictions.toLowerCase().includes(searchLower)) ||
-          (patient.favoriteIngredients &&
-            patient.favoriteIngredients.toLowerCase().includes(searchLower)) ||
-          (patient.unlikedIngredients &&
-            patient.unlikedIngredients.toLowerCase().includes(searchLower))
-        );
-      });
-      setFilteredPatients(filtered);
-    } else {
-      setFilteredPatients(patients);
+      const data = await response.json();
+      setPatients(data); // Set the list of patients
+      setFilteredPatients(data); // Set the filtered patients to the full list initially
+      console.log("patients:", patients); // Log the patients for debugging
+    } catch (err) {
+      setError(err.message); // Set error message if fetching fails
     }
   };
+
+  const fetchUserData = async () => {
+    try {
+      if (user?.token) {
+        // Check if user and token exist
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/api/user/${user.email}`, // Fetching user data based on their email
+          {
+            method: "GET",
+            headers: { Authorization: `Bearer ${user.token}` }, // Authorization header
+          }
+        );
+        const data = await response.json();
+        setUserData(data); // Set user data
+        console.log("user data:", data); // Log user data for debugging
+      }
+    } catch (error) {
+      console.error("Failed to fetch user data:", error); // Handle failure to fetch user data
+    }
+  };
+
+  fetchPatients(); // Fetch patients when the component mounts
+  fetchUserData(); // Fetch user data when the component mounts
+}, [user.token]); // Re-run the effect if user.token changes
+
+// Handle changes in the search input and filter the patients list
+const handleSearch = (e) => {
+  const searchValue = e.target.value; // Get the input value
+  setSearchTerm(searchValue); // Update the search term state
+
+  if (searchValue) {
+    const searchLower = searchValue.toLowerCase(); // Convert input to lowercase for case-insensitive search
+    const filtered = patients.filter((patient) => {
+      return (
+        (patient.firstName &&
+          patient.firstName.toLowerCase().includes(searchLower)) || // Search by first name
+        (patient.lastName &&
+          patient.lastName.toLowerCase().includes(searchLower)) || // Search by last name
+        (patient.id &&
+          patient.id.toString().toLowerCase().includes(searchLower)) || // Search by ID
+        (patient.age && patient.age.toString().includes(searchLower)) || // Search by age
+        (patient.dietaryRestrictions &&
+          patient.dietaryRestrictions.toLowerCase().includes(searchLower)) || // Search by dietary restrictions
+        (patient.favoriteIngredients &&
+          patient.favoriteIngredients.toLowerCase().includes(searchLower)) || // Search by favorite ingredients
+        (patient.unlikedIngredients &&
+          patient.unlikedIngredients.toLowerCase().includes(searchLower)) // Search by unliked ingredients
+      );
+    });
+    setFilteredPatients(filtered); // Update the filtered patients based on the search input
+  } else {
+    setFilteredPatients(patients); // Reset to the full patients list if the search input is cleared
+  }
+};
 
   return (
     <div className="px-5 xl:px-12">

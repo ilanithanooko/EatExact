@@ -9,38 +9,39 @@ import EditRecipe from "../components/EditRecipe";
 
 const EntityRecipes = () => {
   const { user } = useAuthContext();
-  const { entityId } = useParams();
-  const [recipes, setRecipes] = useState([]);
-  const [filteredRecipes, setFilteredRecipes] = useState([]);
+  const { entityId } = useParams(); 
+  const [recipes, setRecipes] = useState([]); 
+  const [filteredRecipes, setFilteredRecipes] = useState([]); 
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [selectedRecipe, setSelectedRecipe] = useState(null); // Track the selected recipe
-  const [isRecipePopupVisible, setIsRecipePopupVisible] = useState(false); // Track the pop-up visibility
-  const [isEditPopupVisible, setIsEditPopupVisible] = useState(false); // Track the pop-up visibility
-  const [recipeToDelete, setRecipeToDelete] = useState(null); // Track the specific recipe to delete
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const [isRecipePopupVisible, setIsRecipePopupVisible] = useState(false); 
+  const [isEditPopupVisible, setIsEditPopupVisible] = useState(false); 
+  const [recipeToDelete, setRecipeToDelete] = useState(null);
   const [title, setTitle] = useState("");
   const [ingredients, setIngredients] = useState("");
   const [instructions, setInstructions] = useState("");
   const [tips, setTips] = useState("");
   const [noRecipes, setNoRecipes] = useState(false);
-  const [isEdited, setIsEdited] = useState(false)
+  const [isEdited, setIsEdited] = useState(false);
 
   const [recipeData, setRecipeData] = useState({
     title: title,
     ingredients: ingredients,
     instructions: instructions,
     tips: tips
-  });
+  }); // Store recipe data for editing
 
   const handleRecipeChange = (e) => {
     const { name, value } = e.target;
-    setRecipeData((prevData) => ({ ...prevData, [name]: value }));
+    setRecipeData((prevData) => ({ ...prevData, [name]: value })); // Handle form changes for editing recipe
   };
 
   const location = useLocation();
   const navigate = useNavigate();
-  const { userData } = location.state || {};
+  const { userData } = location.state || {}; // Get user data from location state if available
 
+  // Fetch recipes from API
   const fetchRecipes = async () => {
     const response = await fetch(
       `${process.env.REACT_APP_API_URL}/api/recipes/${entityId}`,
@@ -52,52 +53,53 @@ const EntityRecipes = () => {
     );
     const json = await response.json();
     if (response.ok) {
-      setRecipes(json);
+      setRecipes(json); // Set recipes from API response
       setFilteredRecipes(json); // Initially show all recipes
-      updateCategories(json); // Update categories
+      updateCategories(json); // Update categories based on the fetched recipes
     } else {
-      setNoRecipes(true);
+      setNoRecipes(true); // No recipes found
       console.log("No recipes in DB");
     }
   };
 
+  // Fetch recipes when component mounts or when user/entityId changes
   useEffect(() => {
-
-
     if (user && entityId) {
       fetchRecipes();
       console.log("Entity Id is:", entityId);
     }
   }, [user, entityId]);
 
+  // Refetch recipes if a recipe has been edited
   useEffect(() => {
     if (isEdited) {
       fetchRecipes();
-      setIsEdited(false)
+      setIsEdited(false); // Reset the edit flag
     }
+  }, [isEdited]);
 
-
-  }, [isEdited])
-
+  // Update the categories list from the recipes
   const updateCategories = (recipesList) => {
     const uniqueCategories = [
       "All",
       ...new Set(recipesList.map((recipe) => recipe.category)),
     ];
-    setCategories(uniqueCategories);
+    setCategories(uniqueCategories); // Update the unique categories
   };
 
+  // Filter recipes based on selected category
   const handleCategoryClick = (category) => {
     setSelectedCategory(category);
     if (category === "All") {
-      setFilteredRecipes(recipes);
+      setFilteredRecipes(recipes); // Show all recipes if "All" is selected
     } else {
       setFilteredRecipes(
-        recipes.filter((recipe) => recipe.category === category)
+        recipes.filter((recipe) => recipe.category === category) // Filter by category
       );
     }
   };
 
+  // Parse the recipe's HTML description into structured data
   const parser = (recipe) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(recipe.description, "text/html");
@@ -108,18 +110,20 @@ const EntityRecipes = () => {
       instructions: Array.from(doc.querySelectorAll("ol li")).map((li) => li.textContent),
       tips: Array.from(doc.querySelectorAll("ul:nth-of-type(2) li")).map((li) => li.textContent)
     };
-  }
-
-  const handleRecipeClick = (recipe) => {
-    const parsedData = parser(recipe);
-    setTitle(parsedData.title);
-    setIngredients(parsedData.ingredients);
-    setInstructions(parsedData.instructions);
-    setTips(parsedData.tips);
-    setSelectedRecipe(recipe);
-    setIsRecipePopupVisible(true);
   };
 
+  // Show recipe details in pop-up
+  const handleRecipeClick = (recipe) => {
+    const parsedData = parser(recipe);
+    setTitle(parsedData.title); // Set recipe title
+    setIngredients(parsedData.ingredients); // Set ingredients
+    setInstructions(parsedData.instructions); // Set instructions
+    setTips(parsedData.tips); // Set tips
+    setSelectedRecipe(recipe); // Mark recipe as selected
+    setIsRecipePopupVisible(true); // Show the recipe pop-up
+  };
+
+  // Show recipe edit form in pop-up
   const handleRecipeEdit = (recipe) => {
     const parsedData = parser(recipe);
     setRecipeData({
@@ -128,22 +132,27 @@ const EntityRecipes = () => {
       instructions: parsedData.instructions.join("\n"),
       tips: parsedData.tips.join("\n")
     });
-    setSelectedRecipe(recipe);
-    setIsEditPopupVisible(true);
-  };
-  const closePopup = () => {
-    setIsRecipePopupVisible(false); // Hide the pop-up
-    setRecipeToDelete(null); // Hide the confirmation pop-up
+    setSelectedRecipe(recipe); // Mark recipe as selected for editing
+    setIsEditPopupVisible(true); // Show the edit pop-up
   };
 
+  // Close the recipe details pop-up
+  const closePopup = () => {
+    setIsRecipePopupVisible(false); // Hide the pop-up
+    setRecipeToDelete(null); // Hide the delete confirmation pop-up
+  };
+
+  // Close the recipe edit pop-up
   const closeEditPopup = () => {
     setIsEditPopupVisible(false); // Hide the pop-up
   };
 
+  // Handle delete recipe click
   const handleDeleteClick = (recipeId) => {
-    setRecipeToDelete(recipeId); // Track the recipe ID for which confirmation is needed
+    setRecipeToDelete(recipeId); // Set the recipe ID for delete confirmation
   };
 
+  // Confirm recipe deletion
   const confirmDelete = async () => {
     if (recipeToDelete) {
       try {
@@ -162,14 +171,10 @@ const EntityRecipes = () => {
           const updatedRecipes = recipes.filter(
             (recipe) => recipe._id !== recipeToDelete
           );
-          setRecipes(updatedRecipes);
-          setFilteredRecipes(updatedRecipes);
-
-          // Update categories after deletion
-          updateCategories(updatedRecipes);
-
-          // Close both pop-ups
-          closePopup();
+          setRecipes(updatedRecipes); // Update recipes
+          setFilteredRecipes(updatedRecipes); // Update filtered recipes
+          updateCategories(updatedRecipes); // Update categories after deletion
+          closePopup(); // Close pop-up
         }
       } catch (error) {
         console.error("Error deleting recipe:", error);
@@ -177,10 +182,12 @@ const EntityRecipes = () => {
     }
   };
 
+  // Cancel recipe deletion
   const cancelDelete = () => {
     setRecipeToDelete(null); // Hide the confirmation pop-up
   };
 
+  // Handle save after editing a recipe
   const handleSave = async () => {
     const recipeHTML = `
       <h1>${recipeData.title}</h1>
@@ -197,26 +204,26 @@ const EntityRecipes = () => {
         ${recipeData.tips.split("\n").map((tip) => `<li>${tip}</li>`).join('')}
       </ul>
     `;
-  
+
     const response = await fetch(`${process.env.REACT_APP_API_URL}/api/recipes/${selectedRecipe._id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${user.token}`,
       },
-      body: JSON.stringify({ title:recipeData.title, description: recipeHTML }),
+      body: JSON.stringify({ title: recipeData.title, description: recipeHTML }),
     });
-  
+
     if (response.ok) {
       const updatedRecipe = await response.json();
       const updatedRecipes = recipes.map((recipe) =>
         recipe._id === selectedRecipe._id ? updatedRecipe : recipe
       );
-      setRecipes(updatedRecipes);
-      setFilteredRecipes(updatedRecipes);
-      closeEditPopup();
-      setSelectedRecipe(null);
-      setIsEdited(true)
+      setRecipes(updatedRecipes); // Update recipes after saving
+      setFilteredRecipes(updatedRecipes); // Update filtered recipes
+      closeEditPopup(); // Close the edit pop-up
+      setSelectedRecipe(null); // Reset selected recipe
+      setIsEdited(true); // Trigger re-fetch of recipes
     } else {
       console.error('Failed to update recipe');
     }
@@ -255,37 +262,34 @@ const EntityRecipes = () => {
             </>
           )}
         </div>
+
         {/* Category Carousel */}
         <div className="flex overflow-x-auto space-x-4 mb-5">
           {categories.map((category) => (
             <button
               key={category}
               className={`text-center rounded-full p-2 px-4 text-sm lg:text-lg shadow-md bg-green-600 hover:bg-green-800 text-white
-                ${
-                  selectedCategory === category
-                    ? "bg-green-800 font-medium"
-                    : ""
-                }`}
+                ${selectedCategory === category ? "bg-green-800 font-medium" : ""}`}
               onClick={() => handleCategoryClick(category)}
             >
               {category}
             </button>
           ))}
         </div>
+
         {/* Display Recipes */}
         <div className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6`}>
           {filteredRecipes.map((recipe) => (
             <RecipeSection
-            key={recipe._id}
-            recipe={recipe}
-            onRecipeClick={() => {handleRecipeClick(recipe)}}
-            onDelete={() => {handleDeleteClick(recipe._id)}}
-            onConfirm={confirmDelete}
-            onCancel={cancelDelete}
-            onEdit={() => {handleRecipeEdit(recipe)}}
-            recipeToDelete={recipeToDelete}
+              key={recipe._id}
+              recipe={recipe}
+              onRecipeClick={() => handleRecipeClick(recipe)} // Show recipe details pop-up
+              onDelete={() => handleDeleteClick(recipe._id)} // Show delete confirmation
+              onConfirm={confirmDelete} // Confirm deletion
+              onCancel={cancelDelete} // Cancel deletion
+              onEdit={() => handleRecipeEdit(recipe)} // Show recipe edit pop-up
+              recipeToDelete={recipeToDelete} // Track which recipe is to be deleted
             />
-
           ))}
         </div>
       </div>
@@ -297,7 +301,7 @@ const EntityRecipes = () => {
             <div className="place-items-end">
               <button
                 className="w-7 h-7 mb-2 bg-gray-500 hover:bg-gray-600 text-white flex items-center justify-center rounded-full"
-                onClick={closePopup}
+                onClick={closePopup} // Close pop-up
               >
                 <GrClose className="text-lg" />
               </button>
@@ -307,39 +311,37 @@ const EntityRecipes = () => {
               ingredients={ingredients}
               instructions={instructions}
               tips={tips}
-              userData={userData}
+              userData={userData} // Pass userData if needed
             />
           </div>
         </div>
       )}
 
       {/* Pop-up for Recipe Edit */}
-    {isEditPopupVisible && (
+      {isEditPopupVisible && (
         <div className="fixed inset-0 mt-16 flex justify-center items-center">
-        <div className="flex flex-col bg-white rounded-lg shadow-lg p-5 mx-4 overflow-y-auto w-auto max-w-full max-h-[80vh]">
-          <div className="text-right">
-            <button
-              className="w-8 h-8 bg-gray-500 hover:bg-gray-600 text-white flex items-center justify-center rounded-full"
-              onClick={closeEditPopup}
-            >
-              <GrClose className="text-lg" />
-            </button>
-          </div>
-          <div className="">
-          <EditRecipe
-            title={recipeData.title}
-            ingredients={recipeData.ingredients}
-            instructions={recipeData.instructions}
-            tips={recipeData.tips}
-            handleRecipeChange={(e)=>{handleRecipeChange(e)}}
-            handleSave={()=>{handleSave()}}
-            
-          />
+          <div className="flex flex-col bg-white rounded-lg shadow-lg p-5 mx-4 overflow-y-auto w-auto max-w-full max-h-[80vh]">
+            <div className="text-right">
+              <button
+                className="w-8 h-8 bg-gray-500 hover:bg-gray-600 text-white flex items-center justify-center rounded-full"
+                onClick={closeEditPopup} // Close the edit pop-up
+              >
+                <GrClose className="text-lg" />
+              </button>
+            </div>
+            <div className="">
+              <EditRecipe
+                title={recipeData.title}
+                ingredients={recipeData.ingredients}
+                instructions={recipeData.instructions}
+                tips={recipeData.tips}
+                handleRecipeChange={handleRecipeChange} // Handle changes in the form
+                handleSave={handleSave} // Save the edited recipe
+              />
+            </div>
           </div>
         </div>
-      </div>
-)}
-
+      )}
     </div>
   );
 };

@@ -6,6 +6,7 @@ import MenuForm from "./MenuForm";
 import { useAuthContext } from "../hooks/useAuthContext";
 import PatientForm from "./PatientForm";
 
+// SettingsForm component renders accout type based components on the settings page
 const SettingsForm = ({ toEdit, userData }) => {
   const [data, setData] = useState([]);
   const [children, setChildren] = useState([]);
@@ -24,11 +25,13 @@ const SettingsForm = ({ toEdit, userData }) => {
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState('');
 
+  // Handles changes in the owner data (personal details)
   const handleOwnerChange = (e) => {
     const { name, value } = e.target;
     setOwnerData((prevData) => ({ ...prevData, [name]: value }));
   };
 
+  // Updates the data array for family members, menus, or patients based on user input
   const handleEntityChange = (e, index) => {
     const { name, value } = e.target;
 
@@ -40,6 +43,7 @@ const SettingsForm = ({ toEdit, userData }) => {
     );
   };
 
+  // Updates the member's details for family members or patients in the state
   const handleMemberChange = (id, data) => {
     setData((prevMembers) =>
       prevMembers.map((member) =>
@@ -47,7 +51,7 @@ const SettingsForm = ({ toEdit, userData }) => {
       )
     );
   };
-
+  // Utility function to show error messages
   const showError = (message) => {
     setError(message);
     setTimeout(function () {
@@ -55,6 +59,7 @@ const SettingsForm = ({ toEdit, userData }) => {
     }, 5000);
   };
 
+  // Utility function to show success messages
   const showSuccessMessage = (message) => {
     setSucessMessage(message);
     setTimeout(function () {
@@ -62,6 +67,7 @@ const SettingsForm = ({ toEdit, userData }) => {
     }, 5000);
   };
 
+  // Updates the owner data
   const updateOwnerData = async (event) => {
     event.preventDefault();
     try {
@@ -90,7 +96,7 @@ const SettingsForm = ({ toEdit, userData }) => {
     }
   };
 
-  // Update child data
+  // Updates a family member's data
   const updateChildData = async (event, id, index) => {
     event.preventDefault();
     try {
@@ -114,7 +120,7 @@ const SettingsForm = ({ toEdit, userData }) => {
     }
   };
 
-  // Update menu data
+  // Updates a menu's data
   const updateMenuData = async (event, id, index) => {
     event.preventDefault();
     try {
@@ -138,8 +144,8 @@ const SettingsForm = ({ toEdit, userData }) => {
     }
   };
 
-    // Update patient data
-    const updatePatientData = async (event, id, index) => {
+  // Updates a patient's data
+  const updatePatientData = async (event, id, index) => {
       event.preventDefault();
       try {
         const response = await fetch(
@@ -162,7 +168,7 @@ const SettingsForm = ({ toEdit, userData }) => {
       }
     };
 
-  // Remove a family member and their saved recipes
+  // Deletes a family member and their saved recipes
   const deleteFamilyMember = async (event, id) => {
     event.preventDefault();
     try {
@@ -206,7 +212,7 @@ const SettingsForm = ({ toEdit, userData }) => {
     }
   };
 
-  // Remove a menu and its saved recipes
+  // Deletes a menu and its saved recipes
   const deleteMenu = async (event, id) => {
     event.preventDefault();
     try {
@@ -248,50 +254,51 @@ const SettingsForm = ({ toEdit, userData }) => {
     }
   };
 
-    // Remove a patient and their saved recipes
-    const deletePatient = async (event, id) => {
-      event.preventDefault();
-      try {
-        // Fetch saved recipes for this patient
-        const recipesResponse = await fetch(
-          `${process.env.REACT_APP_API_URL}/api/recipes/${id}`,
-          {
-            method: "GET",
-            headers: { Authorization: `Bearer ${user.token}` },
-          }
-        );
-        const savedRecipes = await recipesResponse.json();
-        // Delete each saved recipe for the patient
-        if (savedRecipes.length > 0) {
-          for (const recipe of savedRecipes) {
-            await fetch(
-              `${process.env.REACT_APP_API_URL}/api/recipes/${recipe._id}`,
-              {
-                method: "DELETE",
-                headers: { Authorization: `Bearer ${user.token}` },
-              }
-            );
-          }
-        }
-        // delete patient
-        await fetch(`${process.env.REACT_APP_API_URL}/api/patient/${id}`, {
-          method: "DELETE",
+  // Remove a patient and their saved recipes
+  const deletePatient = async (event, id) => {
+    event.preventDefault();
+    try {
+      // Fetch saved recipes for this patient
+      const recipesResponse = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/recipes/${id}`,
+        {
+          method: "GET",
           headers: { Authorization: `Bearer ${user.token}` },
-        });
-        // Update the state by removing the deleted member
-        setData((prevData) => prevData.filter((member) => member.id !== id));
-        setPatients((prevData) => prevData.filter((member) => member.id !== id));
-        showSuccessMessage(
-          "patient & their saved recipes removed successfully!"
-        );
-        setTimeout(async function () {
-          await fetchPatients(); // Fetch the updated family data
-        }, 5000);
-      } catch (error) {
-        showError("Failed to delete patient or their saved recipes.");
+        }
+      );
+      const savedRecipes = await recipesResponse.json();
+      // Delete each saved recipe for the patient
+      if (savedRecipes.length > 0) {
+        for (const recipe of savedRecipes) {
+          await fetch(
+            `${process.env.REACT_APP_API_URL}/api/recipes/${recipe._id}`,
+            {
+              method: "DELETE",
+              headers: { Authorization: `Bearer ${user.token}` },
+            }
+          );
+        }
       }
-    };
+      // delete patient
+      await fetch(`${process.env.REACT_APP_API_URL}/api/patient/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      // Update the state by removing the deleted member
+      setData((prevData) => prevData.filter((member) => member.id !== id));
+      setPatients((prevData) => prevData.filter((member) => member.id !== id));
+      showSuccessMessage(
+        "patient & their saved recipes removed successfully!"
+      );
+      setTimeout(async function () {
+        await fetchPatients(); // Fetch the updated family data
+      }, 5000);
+    } catch (error) {
+      showError("Failed to delete patient or their saved recipes.");
+    }
+  };
 
+  // Adds a family member
   const addFamilyMember = async (event) => {
     event.preventDefault();
     try {
@@ -326,6 +333,7 @@ const SettingsForm = ({ toEdit, userData }) => {
     }
   };
 
+  // Adds a menu
   const addMenu = async (event) => {
     event.preventDefault();
     try {
@@ -359,7 +367,8 @@ const SettingsForm = ({ toEdit, userData }) => {
       showError(error.message);
     }
   };
-
+  
+  // Adds a patient
   const addPatient = async (event) => {
     event.preventDefault();
     try {
@@ -394,6 +403,7 @@ const SettingsForm = ({ toEdit, userData }) => {
     }
   };
 
+  // Fetches family members
   const fetchChildren = async () => {
     try {
       const response = await fetch(
@@ -410,6 +420,7 @@ const SettingsForm = ({ toEdit, userData }) => {
     }
   };
 
+  // Fetches menus
   const fetchMenus = async () => {
     try {
       const response = await fetch(
@@ -426,6 +437,7 @@ const SettingsForm = ({ toEdit, userData }) => {
     }
   };
 
+  // Fetches patients
   const fetchPatients = async () => {
     try {
       const response = await fetch(
@@ -442,6 +454,7 @@ const SettingsForm = ({ toEdit, userData }) => {
     }
   };
 
+  // Fetches data based on the user's role
   useEffect(() => {
     if (userData.role === "Individual") {
       fetchChildren();
@@ -454,6 +467,7 @@ const SettingsForm = ({ toEdit, userData }) => {
     }
   }, [userData]);
 
+  // Adds a new blank entry (family member, menu, or patient)
   const addAnotherMember = () => {
     setData([
       ...data,
@@ -468,10 +482,11 @@ const SettingsForm = ({ toEdit, userData }) => {
     ]);
   };
 
+  // Removes a member (family member, menu, or patient) from the list
   const removeMember = (id) => {
     setData((prevMembers) => prevMembers.filter((member) => member.id !== id));
   };
-
+  // Filters data for patients based on search term
   let filteredData = data;
 
 if (toEdit === 'patients' && searchTerm) {

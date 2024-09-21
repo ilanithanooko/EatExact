@@ -1,9 +1,10 @@
 import React from 'react';
 
+// Recipe pop-up component, allows users to view a recipe in a formatted way
 const Recipe = ({ title, ingredients, instructions, tips, userData }) => {
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">{title}</h1> {/* Tailwind styling */}
+      <h1 className="text-2xl font-bold mb-4">{title}</h1>
       <h2 className="text-xl font-semibold mb-2">Ingredients</h2>
       <ul className="list-disc list-inside mb-4">
         {ingredients.map((ingredient, index) => (

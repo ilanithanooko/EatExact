@@ -1,5 +1,6 @@
 import React from 'react';
 
+// Selectible component to display selectable options with styling based on selection status
 const Selectible = ({ label, onClick, isSelected }) => {
   return (
     <button
@@ -12,5 +13,3 @@ const Selectible = ({ label, onClick, isSelected }) => {
 };
 
 export default Selectible;
-
-//bg-gradient-to-bl from-emerald-900 to-green-600

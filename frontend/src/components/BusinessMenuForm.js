@@ -5,14 +5,15 @@ import { useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaPlus } from "react-icons/fa";
 import MenuForm from "./MenuForm";
 
+// BusinessMenuForm component sets professional users on profile setup process
 const BusinessMenuForm = ({ onBack, onUserDataChange }) => {
   const navigate = useNavigate();
   const [menus, setMenus] = useState([]);
   const [menusCount, setMenusCount] = useState(0);
-  const [isOwnerCollapsed, setIsOwnerCollapsed] = useState(false);
-  const { user } = useAuthContext();
+  const { user } = useAuthContext(); 
   const [error, setError] = useState("");
 
+  // Add a new menu to the list
   const addMenu = () => {
     setMenus([
       ...menus,
@@ -21,20 +22,23 @@ const BusinessMenuForm = ({ onBack, onUserDataChange }) => {
         name: "",
       },
     ]);
-    setMenusCount(menusCount + 1);
+    setMenusCount(menusCount + 1); // Increment the count of menus
   };
 
+  // Handle changes in individual menu data
   const handleMenuChange = (id, data) => {
     setMenus((prevMenus) =>
-      prevMenus.map((menu) => (menu.id === id ? { ...menu, ...data } : menu))
+      prevMenus.map((menu) => (menu.id === id ? { ...menu, ...data } : menu)) // Update the corresponding menu by ID
     );
   };
 
+  // Remove a specific menu from the list by its ID
   const removeMenu = (id) => {
-    setMenus((prevMenus) => prevMenus.filter((menu) => menu.id !== id));
-    setMenusCount(menusCount - 1);
+    setMenus((prevMenus) => prevMenus.filter((menu) => menu.id !== id)); // Remove menu with the specified ID
+    setMenusCount(menusCount - 1); // Decrement the count of menus
   };
 
+  // Display an error message for 5 seconds
   const showError = (message) => {
     setError(message);
     setTimeout(function () {
@@ -42,16 +46,18 @@ const BusinessMenuForm = ({ onBack, onUserDataChange }) => {
     }, 5000);
   };
 
+  // Handle form submission (updates user role and creates menus)
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
+      // update the user's role to "Professional"
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/api/user/updateRole`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
+            Authorization: `Bearer ${user.token}`, // Attach the user's token for authentication
           },
           body: JSON.stringify({
             email: user.email,
@@ -60,9 +66,10 @@ const BusinessMenuForm = ({ onBack, onUserDataChange }) => {
         }
       );
       if (!response.ok) {
-        throw new Error("Failed to update owner information");
+        throw new Error("Failed to update owner information"); // Show error if role update fails
       }
 
+      // Create a menu for each menu in the menus list
       for (const menu of menus) {
         const menuResponse = await fetch(
           `${process.env.REACT_APP_API_URL}/api/menu`,
@@ -70,27 +77,29 @@ const BusinessMenuForm = ({ onBack, onUserDataChange }) => {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${user.token}`,
+              Authorization: `Bearer ${user.token}`, // Attach the user's token for authentication
             },
-            body: JSON.stringify({ ...menu }),
+            body: JSON.stringify({ ...menu }), // Send the menu data
           }
         );
         if (!menuResponse.ok) {
-          throw new Error("Failed to add menu");
+          throw new Error("Failed to add menu"); // Show error if menu creation fails
         }
       }
+
+      // Notify parent component of user data change
       if (onUserDataChange) {
         onUserDataChange();
       }
-      navigate("/");
-      // Redirect or show success message
+      navigate("/"); // Navigate to the home page after successful submission
     } catch (error) {
-      showError(error.message);
+      showError(error.message); // Show error if any step in the process fails
     }
   };
 
   return (
     <div>
+      {/* Back button to return to previous screen */}
       <button
         onClick={onBack}
         className="mb-4 flex items-center text-green-900"
@@ -114,6 +123,8 @@ const BusinessMenuForm = ({ onBack, onUserDataChange }) => {
             delicious and inclusive options, giving every guest a memorable
             dining experience, no matter their dietary requirements.
           </div>
+
+          {/* Button to add a new menu (visible only when there are no menus yet) */}
           <div className="flex justify-center pt-2">
             <button
               type="button"
@@ -128,28 +139,31 @@ const BusinessMenuForm = ({ onBack, onUserDataChange }) => {
             </button>
           </div>
 
+          {/* Render collapsible sections for each menu */}
           <div>
             {menus.map((menu, index) => (
               <div>
-              <Collapsible
-                key={menu.id}
-                trigger={menu.name || `Menu ${index + 1}`}
-                open={index === menus.length - 1}
-              >
-                <MenuForm
-                  menu={menu}
-                  onChange={(data) => handleMenuChange(menu.id, data)}
-                  onRemove={() => removeMenu(menu.id)}
-                  onAdd={() => {
-                    addMenu();
-                  }}
-                />
-              </Collapsible>
-              <hr className="my-2"></hr>
+                <Collapsible
+                  key={menu.id}
+                  trigger={menu.name || `Menu ${index + 1}`} // Trigger text for the collapsible menu form
+                  open={index === menus.length - 1} // Automatically open the last added menu
+                >
+                  {/* MenuForm component for handling individual menu creation */}
+                  <MenuForm
+                    menu={menu}
+                    onChange={(data) => handleMenuChange(menu.id, data)} // Update the menu data
+                    onRemove={() => removeMenu(menu.id)} // Remove the menu
+                    onAdd={() => {
+                      addMenu();
+                    }} // Add a new menu
+                  />
+                </Collapsible>
+                <hr className="my-2"></hr>
               </div>
             ))}
           </div>
 
+          {/* Submit button and error message */}
           <div
             className={`${
               menusCount === 0 ? "hidden" : ""
@@ -166,7 +180,7 @@ const BusinessMenuForm = ({ onBack, onUserDataChange }) => {
             </div>
             {error && (
               <div className="mt-2">
-                <p className="text-red-500">{error}</p>
+                <p className="text-red-500">{error}</p> {/* Display error message */}
               </div>
             )}
           </div>

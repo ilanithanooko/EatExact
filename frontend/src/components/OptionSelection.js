@@ -1,7 +1,7 @@
 import React from "react";
 import { FaUser, FaUsers, FaChild, FaArrowLeft } from "react-icons/fa";
-import RoleButton from "./RoleButton";
 
+// OptionSelection component sets the step on the profile setup page
 const OptionSelection = ({ onSelect, onBack }) => {
   return (
     <div>

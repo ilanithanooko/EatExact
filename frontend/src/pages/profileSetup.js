@@ -15,17 +15,19 @@ const ProfileSetup = ({onUserDataChange}) => {
   const { user } = useAuthContext(); // Get the user from context
   const [error, setError] = useState("");
 
+  // Handle role selection (Individual Use, Professional Use, Dietitian)
   const handleRoleSelect = (role) => {
     setSelectedRole(role);
     if (role === "Dietitian") {
-      handleDietitian();
+      handleDietitian(); // If the role is Dietitian, handle the role update immediately
     } else if (role === "Individual Use") {
-      setStep("individualOptions");
+      setStep("individualOptions"); // If Individual Use, move to option selection
     } else if (role === "Professional Use") {
-      setStep("businessMenu");
+      setStep("businessMenu"); // If Professional Use, move to the business menu form
     }
   };
 
+  // Function to handle updating the role to Dietitian in the backend
   const handleDietitian = async (event) => {
     try {
       const response = await fetch(
@@ -34,40 +36,41 @@ const ProfileSetup = ({onUserDataChange}) => {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
+            Authorization: `Bearer ${user.token}`, // Authorization with the user's token
           },
           body: JSON.stringify({
             email: user.email,
-            role: "Dietitian",
+            role: "Dietitian", // Update the role to Dietitian
           }),
         }
       );
       if (!response.ok) {
         throw new Error("Failed to update owner information");
       }
-      onUserDataChange()
-      navigate("/my-patients");
-      // Redirect or show success message
+      onUserDataChange(); // Call the callback function to notify the parent about user data change
+      navigate("/my-patients"); // Navigate to the dietitian's patient management page
     } catch (error) {
-      setError(error.message);
+      setError(error.message); // Set error message if the request fails
     }
   };
 
+  // Handle the back button functionality to navigate between steps
   const handleBack = () => {
     if (step === "individualOptions") {
-      setStep("selectRole");
+      setStep("selectRole"); // Go back to role selection if in individual options
     } else {
       setStep("selectRole");
-      setSelectedRole(null);
+      setSelectedRole(null); // Reset role selection if navigating back to the first step
     }
   };
 
+  // Handle the selection of options within individual use (e.g., justMe, familyJoin, justKids)
   const handleOptionSelect = (option) => {
     if (option === "justMe") {
-      setStep("personalForm");
+      setStep("personalForm"); // If justMe, move to the personal details form
     } else if (option === "familyJoin" || option === "justKids") {
-      setStep("familyForm");
-      setSelectedRole(option); // This helps to distinguish between familyJoin and justKids in FamilyForm
+      setStep("familyForm"); // Move to family form if familyJoin or justKids is selected
+      setSelectedRole(option); // Store the selected option to distinguish between familyJoin and justKids
     }
   };
 
