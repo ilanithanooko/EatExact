@@ -2,6 +2,8 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 
+// Define the schema for a Patient
+// This schema represents the structure of each Patient's document on MongoDB 
 const patientSchema = new Schema({
   id: {
     type: String,
@@ -34,4 +36,5 @@ const patientSchema = new Schema({
   }
 }, { timestamps: true });
 
+// Export the Patient model for use in other parts of the application
 module.exports = mongoose.model("Patient", patientSchema);
